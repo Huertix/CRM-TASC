@@ -57,6 +57,7 @@ public class Clientes extends JFrame {
 	private JButton nuevoButton;
 	private JButton pedidosButton;
 	private JButton albButton;
+	private JButton futuroCliButton;
 	private JTextField creditoField;
 	private final JComboBox contactoComboBox;
 	private Cliente cliente;
@@ -222,7 +223,7 @@ public class Clientes extends JFrame {
 		
 		obserField = new JTextArea();
 		obserField.setEditable(false);
-		obserField.setBounds(357, 290, 383, 100);
+		obserField.setBounds(357, 320, 383, 100);
 		panelCliente.add(obserField);
 		obserField.setColumns(10);
 		
@@ -262,7 +263,7 @@ public class Clientes extends JFrame {
 		panelCliente.add(contactoLabel);
 		
 		JLabel obserLabel = new JLabel("OBSERVACIONES");
-		obserLabel.setBounds(357, 268, 300, 24);
+		obserLabel.setBounds(357, 320, 300, 24);
 		panelCliente.add(obserLabel);
 		
 		JLabel creditoLabel = new JLabel("CREDITO");
@@ -270,10 +271,21 @@ public class Clientes extends JFrame {
 		creditoLabel.setBounds(610, 150, 150, 24);
 		panelCliente.add(creditoLabel);
 		
+		futuroCliButton = new JButton("NUEVO FUTURO CLIENTE");
+		futuroCliButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				FuturoCliente ps = new FuturoCliente(usuarioID,bd);
+				
+			}
+		}); 
+		futuroCliButton.setBounds(357, 270, 230, 30);
+		futuroCliButton.setEnabled(false);
+		panelCliente.add(futuroCliButton);
+		
 		lsButton = new JButton("LISTADO PRESUPUESTOS");
 		lsButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				Presupuestos ps = new Presupuestos(codigoField.getText(),bd);
+				Presupuestos2 ps = new Presupuestos2(codigoField.getText(),bd);
 				
 			}
 		});

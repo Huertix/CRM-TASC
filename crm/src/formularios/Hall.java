@@ -56,11 +56,13 @@ public class Hall extends JFrame {
 		JButton presuButton = new JButton("VENTAS");
 		presuButton.setFont(new Font("Arial", Font.BOLD, 20));
 		presuButton.setBounds(65, 250, 170, 70);
+		presuButton.setEnabled(false);
 		contentPane.add(presuButton);
 		
 		JButton visitasButton = new JButton("VISITAS");
 		visitasButton.setFont(new Font("Arial", Font.BOLD, 20));
 		visitasButton.setBounds(300, 115, 170, 70);
+		visitasButton.setEnabled(false);
 		contentPane.add(visitasButton);
 		
 		JButton articulosButton = new JButton("ARTICULOS");

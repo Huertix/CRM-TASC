@@ -49,11 +49,11 @@ public class BaseDatos {
 			rs = sentencia.executeQuery(SQL);
 		}
 		catch(SQLException ex){
-			JOptionPane.showMessageDialog(null, "Fallo Conexión SQL consulta","Error",JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, "Fallo Conexión SQL (CONSULTAR): \n"+ex.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);
 			
 		}
 		catch(Exception ex){
-			JOptionPane.showMessageDialog(null, "Fallo Conexión consulta","Error",JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, "Fallo  (CONSULTAR): \n"+ex.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);
 		}
 		
 		return rs;
@@ -71,11 +71,11 @@ public class BaseDatos {
 			
 		}
 		catch(SQLException ex){
-			JOptionPane.showMessageDialog(null, "Fallo Conexión SQL","Error",JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, "Fallo Conexión SQL (INGRESAR): \n"+ex.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);
 			
 		}
 		catch(Exception ex){
-			JOptionPane.showMessageDialog(null, "Fallo Conexión C","Error",JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, "Fallo (INGRESAR): \n"+ex.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);
 		}
 		
 	}

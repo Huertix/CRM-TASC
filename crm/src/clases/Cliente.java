@@ -15,6 +15,16 @@ public class Cliente {
 	private String formaPago;
 	
 	
+	public Cliente(){
+		super();
+	}
+	
+	public Cliente(String codigo,String nombre){
+		this.codigo = codigo;
+		this.nombre = nombre;
+	}
+	
+	
 	public String getFormaPago() {
 		return formaPago;
 	}
@@ -78,10 +88,7 @@ public class Cliente {
 	}
 
 
-	public Cliente(String codigo,String nombre){
-		this.codigo = codigo;
-		this.nombre = nombre;
-	}
+	
 
 
 	@Override

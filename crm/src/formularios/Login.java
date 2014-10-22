@@ -181,7 +181,7 @@ public class Login extends JFrame {
 		lblNewLabel_2.setBackground(Color.WHITE);
 		lblNewLabel_2.setBounds(350, 50, 180, 180);
 		contentPane.add(lblNewLabel_2);
-		rs.close();
+		
 		
 	
 	}

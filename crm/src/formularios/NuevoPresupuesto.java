@@ -2,10 +2,7 @@ package formularios;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
 import java.awt.print.PrinterException;
 
 import javax.swing.AbstractAction;
@@ -31,6 +28,7 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
+import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.CellEditorListener;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -130,8 +128,7 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 		
 		
 		bd = b;
-		this.usuarioID = ID;
-		System.out.println("4: "+usuarioID);
+		this.usuarioID = ID;	
 		this.cliente = cliente;
 		setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		setTitle("NUEVO PRESUPUESTO - CRM TASC");
@@ -371,6 +368,16 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
                
             }
         };
+        rTable.addComponentListener(new ComponentAdapter() {
+            public void componentResized(ComponentEvent e) {
+            	int row = 0;
+            	if(rTable.getSelectedRow()>=0)
+            		row = rTable.getSelectedRow();
+            	else
+            		row = rTable.getRowCount()-1;
+            	rTable.scrollRectToVisible(rTable.getCellRect(row, 0, true));
+            }
+        });
 		rTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);		
 		rTable.setDragEnabled(true);
 		rTable.setAutoscrolls(true);
@@ -417,6 +424,9 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
         
         rTable.getInputMap().put(KeyStroke.getKeyStroke(" ENTER "), "doEnterAction");
         rTable.getActionMap().put("doEnterAction", enterAction);
+        rTable.getInputMap().put(KeyStroke.getKeyStroke(" TAB "), "doEnterAction");
+        rTable.getActionMap().put("doEnterAction", enterAction);
+      
         
 	
 
@@ -451,6 +461,7 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 		printButton.addActionListener(this);
 		printButton.setAlignmentX(Component.LEFT_ALIGNMENT);
 		printButton.setMaximumSize(new Dimension(250,200));
+		printButton.setEnabled(false);
 		buttonsRightPanel.add(printButton);
 		
 		saveButton = new JButton("GUARDAR BD");
@@ -580,6 +591,7 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 		updateButton.doClick();
 		pack();
         setVisible(true);
+
 	}
 	
 	
@@ -765,6 +777,14 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 					}
 					file = new String[6];
 					tmr.insertRow(selectedRowR+nextRow,file);
+					
+
+
+					ListSelectionModel selectionModel = rTable.getSelectionModel();
+					int v = rTable.getRowCount();
+					selectionModel.setSelectionInterval(v, v);
+
+
 					
 					rTable.setModel(tmr);
 					rTable.validate();
@@ -1075,6 +1095,8 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 		
 	}
 	
+	
+
 	
 
 
