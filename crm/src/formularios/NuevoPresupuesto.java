@@ -15,6 +15,7 @@ import javax.swing.DefaultCellEditor;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -51,6 +52,7 @@ import clases.Cliente;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagLayout;
@@ -287,8 +289,9 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 		nOfertaTextField = new JTextField();
 		nOfertaTextField.setDocument(new JTextFieldLimit(10));
 		nOfertaTextField.setText(getNumPresu());
-		nOfertaTextField.setPreferredSize(new Dimension(70,24));
-		nOfertaTextField.setMaximumSize(new Dimension(70,24));
+		nOfertaTextField.setPreferredSize(new Dimension(67,24));
+		nOfertaTextField.setMaximumSize(new Dimension(67,24));
+		nOfertaTextField.setAlignmentX(JComponent.RIGHT_ALIGNMENT);
 		panel2.add(nOfertaTextField);
 		
 		JPanel panel3 = new JPanel();
@@ -300,7 +303,7 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 		panel3.add(Box.createHorizontalStrut(10));
 		
 		creditoTextField = createTextField();
-		creditoTextField.setDocument(new JTextFieldLimit(2));
+		//creditoTextField.setDocument(new JTextFieldLimit(2));
 		creditoTextField.setText(cliente.getCredit());
 		creditoTextField.setEditable(false);
 		creditoTextField.setPreferredSize(new Dimension(100,24));
@@ -326,6 +329,7 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 		ObserPanel.setMaximumSize(new Dimension(380,180));
 		obserTextArea =  new JTextArea(cliente.getObser());	
 		obserTextArea.setLineWrap(true);
+		obserTextArea.setBackground(Color.yellow);
 		obserTextArea.setMinimumSize(new Dimension(350,150));
 		obserTextArea.setPreferredSize(new Dimension(350,150));
 		obserTextArea.setMaximumSize(new Dimension(350,150));
@@ -548,6 +552,7 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 		ObserPanel2.setMaximumSize(new Dimension(300,140));
 		obser2TextArea =  new JTextArea();	
 		obser2TextArea.setLineWrap(true);
+		obser2TextArea.setBackground(Color.yellow);
 		obser2TextArea.setMinimumSize(new Dimension(280,110));
 		obser2TextArea.setPreferredSize(new Dimension(280,110));
 		obser2TextArea.setMaximumSize(new Dimension(280,110));
@@ -923,6 +928,10 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 							String observaciones = obser2TextArea.getText();
 							String cli = cliente.getCodigo();
 							
+							base = checkDecimalString(base);
+							precioiva = checkDecimalString(precioiva);
+							importeiva = checkDecimalString(importeiva);
+							
 							int rows = rTable.getRowCount();
 							
 							for(int i=0;i<rows;i++){
@@ -969,6 +978,15 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 				JOptionPane.showMessageDialog(null, "YA EXISTE ESTE NÚMERO DE PRESUPUESTO");		
 		}
 		else{}    
+	}
+	
+	private String checkDecimalString(String string){
+		
+		int pos = 0;
+		if(string.contains(","))
+			string = string.replaceFirst(",", ".");
+			
+		return string;
 	}
 	
 	
@@ -1025,7 +1043,7 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 			tipoIVA = Integer.parseInt(tipoIvaTextField.getText());
 			iva = (base * tipoIVA)/100;
 			total = base + iva;
-			DecimalFormat df = new DecimalFormat(",##0.00");
+			DecimalFormat df = new DecimalFormat("##0.00");
 			
 			baseTextField.setText(""+df.format(base));
 			ivaTextField.setText(""+df.format(iva));

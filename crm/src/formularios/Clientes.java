@@ -1,6 +1,7 @@
 package formularios;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
@@ -223,6 +224,7 @@ public class Clientes extends JFrame {
 		
 		obserField = new JTextArea();
 		obserField.setEditable(false);
+		obserField.setBackground(Color.yellow);
 		obserField.setBounds(357, 320, 383, 100);
 		panelCliente.add(obserField);
 		obserField.setColumns(10);
