@@ -7,6 +7,7 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -62,14 +63,14 @@ public class Clientes extends JFrame {
 	private JTextField creditoField;
 	private final JComboBox contactoComboBox;
 	private Cliente cliente;
-	private String usuarioID;
+	private String vendedorID;
 
 	/**
 	 * Create the frame.
 	 */
 	public Clientes(final String ID, BaseDatos b) {
 		this.bd = b;
-		this.usuarioID = ID;
+		this.vendedorID = ID;
 		hTable = new Hashtable();
 		setTitle("CRM TASC - CLIENTES");
 		setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
@@ -150,7 +151,7 @@ public class Clientes extends JFrame {
 		
 
 		
-		String sql = "SELECT * FROM clientes WHERE vendedor = '"+usuarioID+"' ORDER BY nombre";
+		String sql = "SELECT * FROM clientes WHERE vendedor = '"+vendedorID+"' ORDER BY nombre";
 		rs = bd.Consultar(sql);
 		try{
 	
@@ -276,18 +277,18 @@ public class Clientes extends JFrame {
 		futuroCliButton = new JButton("NUEVO FUTURO CLIENTE");
 		futuroCliButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				FuturoCliente ps = new FuturoCliente(usuarioID,bd);
+				FuturoCliente ps = new FuturoCliente(vendedorID,bd);
 				
 			}
 		}); 
 		futuroCliButton.setBounds(357, 270, 230, 30);
-		futuroCliButton.setEnabled(false);
+		//futuroCliButton.setEnabled(false);
 		panelCliente.add(futuroCliButton);
 		
 		lsButton = new JButton("LISTADO PRESUPUESTOS");
 		lsButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				Presupuestos2 ps = new Presupuestos2(codigoField.getText(),bd);
+				Presupuestos2 ps = new Presupuestos2(codigoField.getText(),vendedorID,cliente,bd);
 				
 			}
 		});
@@ -299,7 +300,7 @@ public class Clientes extends JFrame {
 		nuevoButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
-					NuevoPresupuesto nps = new NuevoPresupuesto(usuarioID,cliente,bd);
+					NuevoPresupuesto nps = new NuevoPresupuesto(vendedorID,cliente,bd);
 				} catch (SQLException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

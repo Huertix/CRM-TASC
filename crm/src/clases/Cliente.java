@@ -1,29 +1,89 @@
 package clases;
 
 public class Cliente {
-	private String codigo;
-	private String nombre;
-	private String direccs;
-	private String[] tlfs;
-	private String cp;
+	private String codigo = "";
+	private String nombre = "";
+	private String direccs = "";
+	private String poblacion = "";
+	private String provincia = "";
+	private String email = "";
+	private String tlf = "";
+	private String mov = "";
+	private String cp = "";
 	private String[] ofertas;
-	private int vendedor;
-	private String Obser;
-	private String credit;
-	private String cif;
-	private String tipoIVA;
-	private String formaPago;
+	private String vendedor = "";
+	private String Obser = "";
+	private String credit = "";
+	private String cif = "";
+	private String tipoIVA = "";
+	private String formaPago = "";
+	private String contact = "";
+	private boolean isSaved = false;
 	
 	
+
+
+
+
 	public Cliente(){
 		super();
+	
 	}
 	
 	public Cliente(String codigo,String nombre){
 		this.codigo = codigo;
 		this.nombre = nombre;
+
 	}
 	
+	public boolean isSaved() {
+		return isSaved;
+	}
+
+	public void setSaved(boolean isSaved) {
+		this.isSaved = isSaved;
+	}
+	
+	public String getContact() {
+		return contact;
+	}
+
+	public void setContact(String contact) {
+		this.contact = contact;
+	}
+	
+	public String getPoblacion() {
+		return poblacion;
+	}
+
+	public void setPoblacion(String poblacion) {
+		this.poblacion = poblacion;
+	}
+
+	public String getProvincia() {
+		return provincia;
+	}
+
+	public void setProvincia(String provincia) {
+		this.provincia = provincia;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public void setCodigo(String codigo) {
+		this.codigo = codigo;
+	}
+
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
+
 	
 	public String getFormaPago() {
 		return formaPago;
@@ -107,14 +167,24 @@ public class Cliente {
 	}
 
 
-	public String[] getTlfs() {
-		return tlfs;
+	public String getTlf() {
+		return tlf;
 	}
 
 
-	public void setTlfs(String[] tlfs) {
-		this.tlfs = tlfs;
+	public void setTlf(String tlf) {
+		this.tlf = tlf;
 	}
+	
+	public String getMov() {
+		return mov;
+	}
+
+	public void setMov(String mov) {
+		this.mov = mov;
+	}
+
+
 
 
 	public String getCp() {
@@ -137,13 +207,24 @@ public class Cliente {
 	}
 
 
-	public int getVendedor() {
+	public String getVendedor() {
 		return vendedor;
 	}
 
 
-	public void setVendedor(int vendedor) {
+	public void setVendedor(String vendedor) {
 		this.vendedor = vendedor;
+	}
+	
+	public boolean minValues(){
+		if(!nombre.equals("")&&!direccs.equals("")&&
+				!cif.equals("")&&!tlf.equals("")&&
+				!cp.equals("")&&!poblacion.equals("")&&
+				!provincia.equals("")&&!contact.equals("")){
+			
+			return true;
+		}
+		return false;
 	}
 	
 	

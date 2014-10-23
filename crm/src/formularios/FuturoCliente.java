@@ -1,13 +1,22 @@
 package formularios;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
@@ -18,6 +27,7 @@ import javax.swing.text.NumberFormatter;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.PlainDocument;
+import javax.xml.parsers.ParserConfigurationException;
 
 import clases.BaseDatos;
 import clases.Cliente;
@@ -37,8 +47,10 @@ public class FuturoCliente extends JFrame {
 	private JLabel provinciaLabel;
 	private JLabel contactoLabel;
 	private JLabel telefonoLabel;
+	private JLabel movilLabel;
 	private JLabel faxLabel;
 	private JLabel emailLabel;
+	private JTextField codigoTextField;
 	private JTextField nombreTextField;
 	private JTextField cifTextField;
 	private JTextField direccTextField;
@@ -47,8 +59,13 @@ public class FuturoCliente extends JFrame {
 	private JTextField provinciaTextField;
 	private JTextField contactoTextField;
 	private JTextField telefonoTextField;
+	private JTextField movilTextField;
 	private JTextField faxTextField;
 	private JTextField emailTextField;
+	private JButton nuevoButton;
+	private JButton guardarButton;
+	private JButton visitaButton;
+	private NuevoPresupuesto nps;
 
 	
 
@@ -57,7 +74,7 @@ public class FuturoCliente extends JFrame {
 		vendedor = ID;
 		setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		setTitle("CREACION FUTURO CLIENTE - CRM TASC");
-		setBounds(100, 100, 550, 400);
+		setBounds(100, 100, 550, 450);
 		setLocationRelativeTo(null);
 		
 		setResizable(false);
@@ -73,6 +90,12 @@ public class FuturoCliente extends JFrame {
 		codigoLabel.setBounds(10, 10, 100, 24);
 		codigoLabel.setFont(new Font("Arial", Font.BOLD, 14));
 		contentPane.add(codigoLabel);
+		codigoTextField = new JTextField();
+		codigoTextField.setEditable(false);	
+		codigoTextField.setBounds(120, 10, 30, 24);
+		codigoTextField.setFont(new Font("Arial", Font.BOLD, 14));
+		codigoTextField.setAlignmentX(Component.RIGHT_ALIGNMENT);
+		contentPane.add(codigoTextField);
 	
 		nombreLabel= new JLabel("NOMBRE: ");
 		nombreLabel.setBounds(10, 40, 100, 24);
@@ -148,23 +171,119 @@ public class FuturoCliente extends JFrame {
 		telefonoTextField.setFont(new Font("Arial", Font.BOLD, 14));
 		contentPane.add(telefonoTextField);
 		
+		movilLabel = new JLabel("MOVIL: ");
+		movilLabel.setBounds(10, 280, 100, 24);
+		movilLabel.setFont(new Font("Arial", Font.BOLD, 14));
+		contentPane.add(movilLabel);
+		movilTextField = new JTextField();
+		movilTextField.setBounds(120, 280, 150, 24);
+		movilTextField.setFont(new Font("Arial", Font.BOLD, 14));
+		contentPane.add(movilTextField);
+		
 		faxLabel = new JLabel("FAX: ");
-		faxLabel.setBounds(10, 280, 100, 24);
+		faxLabel.setBounds(10, 310, 100, 24);
 		faxLabel.setFont(new Font("Arial", Font.BOLD, 14));
 		contentPane.add(faxLabel);
 		faxTextField = new JTextField();
-		faxTextField.setBounds(120, 280, 150, 24);
+		faxTextField.setBounds(120, 310, 150, 24);
 		faxTextField.setFont(new Font("Arial", Font.BOLD, 14));
 		contentPane.add(faxTextField);
 		
 		emailLabel = new JLabel("EMAIL: ");
-		emailLabel.setBounds(10, 310, 100, 24);
+		emailLabel.setBounds(10, 340, 100, 24);
 		emailLabel.setFont(new Font("Arial", Font.BOLD, 14));
 		contentPane.add(emailLabel);
 		emailTextField = new JTextField();
-		emailTextField.setBounds(120, 310, 400, 24);
+		emailTextField.setBounds(120, 340, 400, 24);
 		emailTextField.setFont(new Font("Arial", Font.BOLD, 14));
 		contentPane.add(emailTextField);
+		
+	
+		guardarButton = new JButton("GUARDAR CLIENTE");
+		guardarButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				
+						
+				cliente.setCodigo(codigoTextField.getText());
+				cliente.setNombre(nombreTextField.getText());
+				cliente.setVendedor(vendedor);
+				cliente.setCif(cifTextField.getText());
+				cliente.setCp(cpTextField.getText());
+				cliente.setDireccs(direccTextField.getText());
+				cliente.setPoblacion(poblacionTextField.getText());
+				cliente.setProvincia(provinciaTextField.getText());
+				cliente.setContact(contactoTextField.getText());
+				cliente.setTlf(telefonoTextField.getText());
+				cliente.setMov(movilTextField.getText());
+				
+				boolean existe = false;
+			    int cod = Integer.parseInt(cliente.getCodigo());
+			    String q = "SELECT codigo FROM prclient WHERE codigo = "+Integer.parseInt(cliente.getCodigo());
+			    
+			    try{
+			    	ResultSet ofrs = bd.Consultar(q);
+			    	existe = ofrs.next();
+	
+				
+				int codigo = Integer.parseInt(cliente.getCodigo());
+				
+				String sql = "INSERT prclient VALUES ("+codigo+",'"+cliente.getCif()+"','"+cliente.getNombre()+"','"
+						+cliente.getDireccs()+"','"+cliente.getCp()+"','','"+cliente.getTlf()+"','TRUE','01','','"
+						+cliente.getContact()+"','','TRUE','"+cliente.getPoblacion()+"','"+cliente.getProvincia()+"','"
+						+cliente.getVendedor()+"')";
+				System.out.println(sql);
+				
+					
+		
+					if(cliente.minValues() && !existe){
+						bd.Ingresar(sql);
+						cliente.setSaved(true);
+					}
+					else{
+						if(existe)
+							JOptionPane.showMessageDialog(null, "CLIENTE YA EXISTE");
+						else
+							JOptionPane.showMessageDialog(null, "RELLENE TODOS LOS CAMPOS");
+					}
+				}
+				catch(Exception s){
+					System.out.println("ERROR 0: "+s.getMessage());
+				}
+				
+			}
+		});
+		guardarButton.setBounds(30, 380, 200, 30);
+		contentPane.add(guardarButton);
+
+		
+		
+		nuevoButton = new JButton("NUEVO PRESUPUESTO");
+		nuevoButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					if(!cliente.isSaved())
+						guardarButton.doClick();
+					if(cliente.isSaved())
+						nps = new NuevoPresupuesto(vendedor,cliente,bd);
+					
+				} catch(Exception s){
+					System.out.println("ERROR 1: "+s.getMessage());
+				}
+
+				
+			}
+		});
+		nuevoButton.setBounds(300,380, 200, 30);
+		contentPane.add(nuevoButton);
+		
+
+		
+		try {
+			getCodigoCliente();
+		} catch (SQLException | ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			System.out.println("ERROR getting client ID: "+e.getMessage());
+		}
 		
 
 		setVisible(true);
@@ -209,6 +328,26 @@ public class FuturoCliente extends JFrame {
 		});
 		return field;
 	}
+	
+	
+	public void  getCodigoCliente() throws SQLException, ParserConfigurationException{
+	
+		String sql = "SELECT codigo FROM prclient ORDER BY codigo";
+		
+		ResultSet rs = bd.Consultar(sql);
+	
+		if(rs.next()){	
+			rs.last();
+			int last = rs.getInt(1);
+			last +=1;  
+			cliente.setCodigo(""+last);
+			codigoTextField.setText(cliente.getCodigo());
+		}
+
+	}	
+	
+
+
 	
 
 }

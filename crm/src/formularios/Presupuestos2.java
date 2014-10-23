@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
+import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -36,14 +37,27 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableColumn;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultEditorKit;
+import javax.swing.text.DocumentFilter;
+import javax.swing.text.NumberFormatter;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.PlainDocument;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.jdesktop.swingx.JXDatePicker;
 
 import clases.BaseDatos;
+import clases.Cliente;
 
 public class Presupuestos2 extends JFrame {
 
@@ -63,14 +77,20 @@ public class Presupuestos2 extends JFrame {
 	private double importe;
 	private double importeiva;
 	private String iva = "";
+	private JButton modButton;
+	private JButton printButton;
+	private Cliente cliente;
+	private String numerOferta;
+	private String vendedorID;
 
 
 
 
 	
-	public Presupuestos2(final String codigo,BaseDatos b) {
+	public Presupuestos2(final String codigo,String ID, Cliente c,BaseDatos b) {
 		this.bd = b;
-	
+		cliente = c;
+		vendedorID = ID;
 		
 		setTitle("CRM TASC - VISOR DE PRESUPUESTOS");
 		setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);	
@@ -114,11 +134,12 @@ public class Presupuestos2 extends JFrame {
 				if( numeroComboBox.getSelectedItem()!=null){
 					
 					String st = numeroComboBox.getSelectedItem().toString();
+					numerOferta = st;
 					//JOptionPane.showMessageDialog(null, st,"ELECCION",JOptionPane.INFORMATION_MESSAGE);
 					st = String.format("%10s",st);
 					
 					System.out.println(st);
-					String sql = "SELECT articulo,definicion,unidades,precio,importe,tipo_iva,importeiva FROM d_presuv  WHERE numero = '"+st+"'"; 
+					String sql = "SELECT articulo,unidades,definicion,precio,dto1,importe,tipo_iva,importeiva FROM d_presuv  WHERE numero = '"+st+"'"; 
 					
 					String sqlFecha = "SELECT c_presuv.fecha FROM d_presuv,c_presuv WHERE d_presuv.numero = c_presuv.numero AND d_presuv.numero = '"+st+"'";
 					
@@ -160,15 +181,86 @@ public class Presupuestos2 extends JFrame {
 
 		});
 		
+	
+		
 		modelo = new DefaultTableModel(){
 		    @Override
 			public boolean isCellEditable(int row, int column)
 		    {
-		        return false;
+		        if(column==0 || column==5)
+		        	return false;
+		        else
+		        	return true;
 		    }
 		};
-		tabla = new JTable();
 		
+		
+
+    
+
+		modelo.addColumn("REFERENCIA");
+		modelo.addColumn("CANTIDAD");
+		modelo.addColumn("DESCRIPCION");
+		modelo.addColumn("PRECIO");
+		modelo.addColumn("DTO");
+		modelo.addColumn("TOTAL");
+		
+		JTextField field = createTextField();
+		
+			// DEfine tipo de texto admitido en la celdas
+		final TableCellEditor editor = new DefaultCellEditor(field);
+		tabla = new JTable(modelo){
+	        @Override
+	        public TableCellEditor getCellEditor(int row, int column) {
+	            int modelColumn = convertColumnIndexToModel(column);
+	            
+	            if(column==1 || column==3 || column==4){
+	                return editor;
+	            } else {
+	                return super.getCellEditor(row, column);
+	            }
+	           
+	        }
+	    };
+
+		
+		TableColumn col = tabla.getColumnModel().getColumn(0);
+		
+		col = tabla.getColumnModel().getColumn(0);
+        col.setPreferredWidth(100);
+        col.setMaxWidth(120);
+        
+        col = tabla.getColumnModel().getColumn(1);
+  
+        col.setPreferredWidth(60);
+        col.setMaxWidth(80);
+        
+        col = tabla.getColumnModel().getColumn(2);
+        col.setMaxWidth(75);
+        col.setPreferredWidth(300);
+        col.setMaxWidth(800);
+        
+        col = tabla.getColumnModel().getColumn(3);
+        col.setPreferredWidth(100);
+        col.setMaxWidth(120);
+        
+        col = tabla.getColumnModel().getColumn(4);
+        col.setPreferredWidth(50);
+        col.setMaxWidth(60);
+        
+        col = tabla.getColumnModel().getColumn(5);
+        col.setPreferredWidth(100);
+        col.setMaxWidth(120);
+        
+        
+        DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
+        rightRenderer.setHorizontalAlignment(SwingConstants.RIGHT);
+        tabla.getColumnModel().getColumn(1).setCellRenderer(rightRenderer);
+        tabla.getColumnModel().getColumn(3).setCellRenderer(rightRenderer);
+        tabla.getColumnModel().getColumn(4).setCellRenderer(rightRenderer);
+        tabla.getColumnModel().getColumn(5).setCellRenderer(rightRenderer);	
+		
+
 		
 		array = new ArrayList<String>();
 		JButton updateButton = new JButton("ACTUALIZAR");
@@ -202,9 +294,13 @@ public class Presupuestos2 extends JFrame {
 						 +" WHERE c_presuv.cliente = "+codigo+" AND c_presuv.fecha >= '"+fechaIni+"' AND c_presuv.fecha <= '"+fechaFin+"' ORDER BY c_presuv.fecha";
 				
 				System.out.println(sql);
+				
+				
+				
 				try {
 					rs = bd.Consultar(sql);
 					
+					modButton.setEnabled(true);
 					
 					while(rs.next()){
 						String numero = rs.getString("numero");
@@ -261,32 +357,55 @@ public class Presupuestos2 extends JFrame {
 		fechaFinJP.setBounds(600, 34, 110, 24);
 		contentPane.add(fechaFinJP);
 		
+		modButton = new JButton("MODIFICAR");
+		modButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+			
+				try {
+					ModificarPresupuesto mp = new ModificarPresupuesto(tabla, numerOferta, vendedorID, cliente,bd);
+					setVisible(false);
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		});
+		modButton.setBounds(35, 650, 120, 30);
+		modButton.setEnabled(false);
+		contentPane.add(modButton);
+		
+		printButton = new JButton("IMPRIMIR");
+		printButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+			
+				
+			}
+		});
+		printButton.setBounds(200, 650, 100, 30);
+		printButton.setEnabled(false);
+		contentPane.add(printButton);
+		
+		
 			
 		importeIvaLabel = new JLabel("TOTAL   "+importeiva);
 		importeIvaLabel.setBounds(750, 650, 250, 24);
 		importeIvaLabel.setHorizontalAlignment(SwingConstants.LEFT);
-		importeIvaLabel.setFont(new Font("Arial", Font.BOLD, 20));
+		importeIvaLabel.setFont(new Font("Arial", Font.BOLD, 18));
 		contentPane.add(importeIvaLabel);
 			
 		importeLabel = new JLabel("BASE   "+importe);
-		importeLabel.setBounds(250, 650, 250, 24);
+		importeLabel.setBounds(400, 650, 250, 24);
 		importeLabel.setHorizontalAlignment(SwingConstants.LEFT);
-		importeLabel.setFont(new Font("Arial", Font.BOLD, 20));
+		importeLabel.setFont(new Font("Arial", Font.BOLD, 18));
 		contentPane.add(importeLabel);
 		
 
 		ivaLabel = new JLabel("IVA   "+iva);
-		ivaLabel.setBounds(530, 650, 150, 24);
+		ivaLabel.setBounds(630, 650, 150, 24);
 		ivaLabel.setHorizontalAlignment(SwingConstants.LEFT);
-		ivaLabel.setFont(new Font("Arial", Font.BOLD, 20));
+		ivaLabel.setFont(new Font("Arial", Font.BOLD, 18));
 		contentPane.add(ivaLabel);
 		
-		
-		modelo.addColumn("ARTÍCULO");
-		modelo.addColumn("DEFINICIÓN");
-		modelo.addColumn("UNIDADES");
-		modelo.addColumn("PRECIO");
-		modelo.addColumn("IMPORTE");
 		JScrollPane scrollPane = new JScrollPane(tabla);
 		scrollPane.setBounds(20, 70, 960, 570);
 		contentPane.add(scrollPane);
@@ -303,7 +422,8 @@ public class Presupuestos2 extends JFrame {
 		
 		ResultSetMetaData metaDatos = rs.getMetaData();
 		
-		int numeroColumnas = metaDatos.getColumnCount();
+		//int numeroColumnas = metaDatos.getColumnCount();
+		int numeroColumnas = 6;
 
 		DecimalFormat df = new DecimalFormat("#,###.##");
 		Double value = 0.00;
@@ -326,8 +446,32 @@ public class Presupuestos2 extends JFrame {
 		   Object [] fila = new Object[numeroColumnas]; // Hay 5 columnas en la tabla
 
 		   // Se rellena cada posición del array con una de las columnas de la tabla en base de datos.
+		   int columna = 0;
 		   for (int i=0;i<numeroColumnas;i++){
-		      
+		     
+			   String a = rs.getString(i+1);
+			   
+			   if(iva.trim().equals("")){
+				   System.out.println("SI");
+				   this.iva = rs.getString("tipo_iva");
+			   }
+			   
+			   if(a.toString().equals("0.000000")){
+				   a="";
+			   }
+				   
+			   fila[i] = a;
+			   
+			   String checkFila0 = (String)fila[0];
+			   if(checkFila0.trim().equals("")){
+				   
+				   fila[4]="";
+			   }
+			   
+			   
+			   
+			   
+			   /* 
 			   Object a = rs.getObject(i+1);
 			   //System.out.println(a.getClass().getName());
 			   if(a.getClass().getName().equals("java.math.BigDecimal")){
@@ -336,13 +480,22 @@ public class Presupuestos2 extends JFrame {
 				   }
 				   
 				   else{
-					   this.iva = rs.getString("tipo_iva");
+					   if(iva.trim().equals("")){
+						   System.out.println("SI");
+						   this.iva = rs.getString("tipo_iva");
+					   }
 					   BigDecimal b = (BigDecimal) a;
 					   value = b.doubleValue();
 					   a = value;
 				   }
 			   }
+		   
+			   
 			   fila[i] = a; // El primer indice en rs es el 1, no el cero, por eso se suma 1.
+			   */
+
+
+			   
 			   modelo.isCellEditable(rs.getRow(), i+1);
 		     
 		   }
@@ -352,9 +505,29 @@ public class Presupuestos2 extends JFrame {
 		importeLabel.setText("BASE   "+resultImporte+" €");
 		importeIvaLabel.setText("TOTAL   "+resultImporteIva+" €");
 		ivaLabel.setText("IVA   "+this.iva+"%");
-		tabla.setModel(modelo);
+		//tabla.setModel(modelo);
 		
 	}
+	
+	private JTextField createTextField() {
+        JTextField field = new JTextField();
+        ((AbstractDocument) field.getDocument()).setDocumentFilter(new DocumentFilter() {
+            @Override
+            public void insertString(FilterBypass fb, int off, String str, AttributeSet attr)
+                    throws BadLocationException {
+
+                //fb.insertString(off, str.replaceAll("\\D++", ""), attr);  // remove non-digits
+            	fb.insertString(off, str.replaceAll("[^0-9.]", ""), attr);
+            }
+
+            @Override
+            public void replace(FilterBypass fb, int off, int len, String str, AttributeSet attr)
+                    throws BadLocationException {               
+            	fb.replace(off, len, str.replaceAll("[^0-9.]", ""), attr);
+            }
+        });
+        return field;
+    }
 
 }
 

@@ -82,7 +82,7 @@ import org.jdesktop.swingx.JXDatePicker;
 import java.awt.Component;
 
 
-public class NuevoPresupuesto extends JFrame implements ActionListener { 
+public class ModificarPresupuesto extends JFrame implements ActionListener { 
 
 	private static Action enterAction;
 	private JPanel contentPane;
@@ -116,31 +116,35 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 	private static JTextField tipoIvaTextField;
 	private static JTextField ivaTextField;
 	private static JTextField totalTextField;
-	private String usuarioID;
+	private String vendedorID;
 	private JRadioButton nombreRadioButton;
 	private JRadioButton codigoRadioButton;
 	private  BaseDatos bd;
+	private String numerOferta;
+	private JTable tableImported;
 
 
 	/**
 	 * Create the frame.
 	 * @throws SQLException 
 	 */
-	public NuevoPresupuesto(String ID, Cliente cliente,BaseDatos b) throws SQLException {
+	public ModificarPresupuesto(JTable t, String oferta, String ID, Cliente cliente,BaseDatos b) throws SQLException {
 		
 		
 		bd = b;
-		this.usuarioID = ID;	
+		this.vendedorID = ID;	
 		this.cliente = cliente;
+		numerOferta = oferta;
+		tableImported = t;
 		setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-		setTitle("NUEVO PRESUPUESTO - CRM TASC");
+		setTitle("MODIFICAR PRESUPUESTO - CRM TASC");
 		
 		setBounds(100, 100, 700, 600);
 		contentPane = new JPanel(new BorderLayout());
 		
-		JTextField field = createTextField();
 		
-		// PANEL IZQUIERDO
+		
+		// PANEL IZQUIERDO -------------------------------------------------------------------------
 		JPanel leftPanel = new JPanel();
 		leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
 		leftPanel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
@@ -241,7 +245,9 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 		leftPanel.add(añadirButton);
 		
 		
-		// PANEL DERECHO
+		
+		
+		// PANEL DERECHO ------------------------------------------------------------------------------
 		JPanel rightPanel = new JPanel();
 		rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
 		rightPanel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
@@ -288,7 +294,9 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 		
 		nOfertaTextField = new JTextField();
 		nOfertaTextField.setDocument(new JTextFieldLimit(10));
-		nOfertaTextField.setText(getNumPresu());
+		//nOfertaTextField.setText(getNumPresu());
+		nOfertaTextField.setText(numerOferta);
+		System.out.println("nOferta: "+ numerOferta);
 		nOfertaTextField.setPreferredSize(new Dimension(67,24));
 		nOfertaTextField.setMaximumSize(new Dimension(67,24));
 		nOfertaTextField.setAlignmentX(JComponent.RIGHT_ALIGNMENT);
@@ -334,29 +342,13 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 		obserTextArea.setPreferredSize(new Dimension(350,150));
 		obserTextArea.setMaximumSize(new Dimension(350,150));
 		ObserPanel.add(obserTextArea);
+		
+		tmr = (DefaultTableModel) tableImported.getModel();
 					
 	
-		//Define celdas editables Tabla derecha
-		tmr = new DefaultTableModel(){
-		    @Override
-			public boolean isCellEditable(int row, int column)
-		    {
-		        if(column==0 || column==5)
-		        	return false;
-		        else
-		        	return true;
-		    }
-		};
-		
-		tmr.addColumn("REFERENCIA");
-		tmr.addColumn("CANTIDAD");
-		tmr.addColumn("DESCRIPCION");
-		tmr.addColumn("PRECIO");
-		tmr.addColumn("DTO");
-		tmr.addColumn("TOTAL");
-		
-		int columns = tmr.getColumnCount();
 
+		JTextField field = createTextField();
+		
 			// DEfine tipo de texto admitido en la celdas
 		final TableCellEditor editor = new DefaultCellEditor(field);
 		rTable = new JTable(tmr){
@@ -366,8 +358,7 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
                 
                 if(column==1 || column==3 || column==4){
                     return editor;
-                } 
-               else {
+                } else {
                     return super.getCellEditor(row, column);
                 }
                
@@ -504,6 +495,7 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 		tipoIvaLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		tipoIvaTextField = createTextField();
 		tipoIvaTextField.setText("21");
+		tipoIvaTextField.setText(cliente.getTipoIVA());
 		tipoIvaTextField.setFont(new Font("Arial", Font.BOLD, 14));
 		tipoIvaTextField.setHorizontalAlignment(JTextField.RIGHT);
 		tipoIvaTextField.setPreferredSize(new Dimension(30,24));
@@ -594,6 +586,7 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 		setContentPane(contentPane);
 	
 		updateButton.doClick();
+		updateRTable();
 		pack();
         setVisible(true);
 
@@ -657,26 +650,7 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 			} 
 	}
 	
-	
-	private String getNumPresu() throws SQLException{
-		
-		String q = "SELECT numero FROM c_presuv  WHERE modificado IS NULL OR modificado < '1' ORDER BY fecha";			
-		ResultSet aux = bd.Consultar(q);	
-		aux.last();	
-		JTextField jt = createTextField();
-		jt.setText(aux.getString(1));	
-		String numero = jt.getText();
-		int nextNumero = Integer.parseInt(numero)+1;		
-		numero = String.format("%10s",""+nextNumero);
-		return numero;
-	}
-	
-	
-	
-	
 
-	
-	
 	
 	public void actionPerformed(ActionEvent e) {
 			
@@ -810,6 +784,8 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 			
 			int selectedRow = rTable.getSelectedRow();
 			String[] file = new String[6];
+			for(int i=0;i<6;i++)
+				file[i] = "";
 			
 			if(selectedRow >=0 && selectedRow < rTable.getRowCount()){
 				tmr.insertRow(selectedRow, file);		
@@ -911,7 +887,7 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 							Date date = fechaJP.getDate();
 							SimpleDateFormat date_format = new SimpleDateFormat("yyyyMMdd");
 							String fecha = date_format.format(date); 
-							String usuario = ""+usuarioID;
+							String usuario = ""+vendedorID;
 							String articulo = "";
 							String def = "";
 							String importe = "0";
@@ -935,12 +911,12 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 							int rows = rTable.getRowCount();
 							
 							for(int i=0;i<rows;i++){
-								articulo =getString(rTable.getValueAt(i, 0),0);
-								unidades = getString(rTable.getValueAt(i, 1),1);
-								def = getString(rTable.getValueAt(i, 2),0);
-								precio = getString(rTable.getValueAt(i, 3),1);
-								dto = getString(rTable.getValueAt(i, 4),1);
-								importe = getString(rTable.getValueAt(i, 5),1);
+								articulo =getString(""+rTable.getValueAt(i, 0),0);
+								unidades = getString(""+rTable.getValueAt(i, 1),1);
+								def = getString(""+rTable.getValueAt(i, 2),0);
+								precio = getString(""+rTable.getValueAt(i, 3),1);
+								dto = getString(""+rTable.getValueAt(i, 4),1);
+								importe = getString(""+rTable.getValueAt(i, 5),1);
 								linea = ""+(i+1);
 						
 								String sqlD_Presuv = "INSERT d_presuv VALUES ('COMERCIAL#"+usuario+"','01','"+nOfertaTextField.getText()+"',NULL,'"+articulo+"','"+def+"','"
@@ -962,7 +938,7 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 							String sqlC_Presuv = "INSERT c_presuv VALUES ('COMERCIAL#"+usuario+"','01','"+nOfertaTextField.getText()+"','"
 									+fecha+"','"+cli+"','1',NULL,'','"+usuario+"','','0.00','0','0','"+observaciones+"','0','"
 									+base+"','0','000','1.000000','"+base+"','','','0','0',NULL,'"+fecha+"','0.0000','0.0000','0',"
-											+ "'','','0','','','','','0','0','','0')";
+											+ "'','','0','','','','','0','0','','1')";
 	
 							System.out.println(sqlC_Presuv);
 							
@@ -990,17 +966,21 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 	}
 	
 	
-	private String getString(Object o, int tipo){
-		
-		String value = ""+o;
-		
-		if(value.equals("null") && tipo==0)
+	private String getString(String s, int tipo){
+			
+		if(s.equals("") && tipo==0)
 			return "";
 		
-		else if(value.equals("null") && tipo==1)
+		else if(s==null && tipo==0)
+			return "";
+		
+		else if(s.equals("") && tipo==1)
+			return "0";
+		
+		else if(s==null && tipo==1)
 			return "0";
 		else
-			return value; 
+			return s; 
 	}
 	
 	private static void updateRTable(){
@@ -1021,11 +1001,13 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 			String check2 = (String) rTable.getValueAt(i, 3);
 			String check3 = (String) rTable.getValueAt(i, 4) ;
 			
-			if(check!=null && check1!=null && check2!=null && check3!=null){
+			if(check!=null && check1!=null && check2!=null && check3!=null &&
+					check1!="" && check2!="" && check3!=""){
 			
 				Double cantidad = Double.parseDouble(check1);
 				Double precio = Double.parseDouble(check2);
 				Double descuento = Double.parseDouble(check3);
+	
 				Double importe = cantidad * precio;
 				
 				if(descuento > 0){
@@ -1107,7 +1089,7 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 		public void actionPerformed(ActionEvent ac) {
 					
 			System.out.println( "The Enter key has been pressed." );
-			NuevoPresupuesto.updateRTable();
+			ModificarPresupuesto.updateRTable();
 			
 		}
 		

@@ -301,7 +301,7 @@ public class Pedidos extends JFrame {
 		
 		int numeroColumnas = metaDatos.getColumnCount();
 
-		DecimalFormat df = new DecimalFormat("#,###.##");
+		DecimalFormat df = new DecimalFormat(",##0.##");
 		Double value = 0.00;
 		String resultImporte ="";
 		String resultImporteIva ="";
