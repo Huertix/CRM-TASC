@@ -48,6 +48,7 @@ import javax.swing.text.PlainDocument;
 
 import clases.BaseDatos;
 import clases.Cliente;
+import clases.Tasc;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -943,7 +944,7 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 								importe = getString(rTable.getValueAt(i, 5),1);
 								linea = ""+(i+1);
 						
-								String sqlD_Presuv = "INSERT d_presuv VALUES ('COMERCIAL#"+usuario+"','01','"+nOfertaTextField.getText()+"',NULL,'"+articulo+"','"+def+"','"
+								String sqlD_Presuv = "INSERT d_presuv VALUES ('COMERCIAL#"+usuario+"','"+Tasc.EMPRESA+"','"+nOfertaTextField.getText()+"',NULL,'"+articulo+"','"+def+"','"
 										+unidades+"','"+precio+"','"+dto+"','0','"+importe+"','"+tipo_iva+"','0.000000','0.000000','"+coste+"','','"+linea+"','"
 										+cli+"','"+precioiva+"','"+importeiva+"','0','"+familia+"','0','"+precio+"','"
 										+importe+"','0','0.0000','1','0.0000','0','','','','"+importeiva+"','"+precioiva+"','0','','','','','','','','0.00',"
@@ -959,7 +960,7 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 								}				
 							}
 			
-							String sqlC_Presuv = "INSERT c_presuv VALUES ('COMERCIAL#"+usuario+"','01','"+nOfertaTextField.getText()+"','"
+							String sqlC_Presuv = "INSERT c_presuv VALUES ('COMERCIAL#"+usuario+"','"+Tasc.EMPRESA+"','"+nOfertaTextField.getText()+"','"
 									+fecha+"','"+cli+"','1',NULL,'','"+usuario+"','','0.00','0','0','"+observaciones+"','0','"
 									+base+"','0','000','1.000000','"+base+"','','','0','0',NULL,'"+fecha+"','0.0000','0.0000','0',"
 											+ "'','','0','','','','','0','0','','0')";
