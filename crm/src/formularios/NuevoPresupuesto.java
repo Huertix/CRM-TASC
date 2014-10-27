@@ -136,7 +136,24 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 		setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		setTitle("NUEVO PRESUPUESTO - CRM TASC");
 		
-		setBounds(100, 100, 700, 600);
+		setBounds(100, 100, 600, 500);
+		
+		addWindowListener( new WindowAdapter(){
+			public void windowClosing(WindowEvent e){
+		
+				JFrame frame = (JFrame)e.getSource();
+		
+				int result = JOptionPane.showConfirmDialog(frame,
+						"¿Seguro Desea Abandonar la Aplicación?\n Los datos introducidos podrían perdese",
+						"Abandonar Ventana",JOptionPane.YES_NO_OPTION);
+				if(result == JOptionPane.YES_OPTION)
+					frame.setDefaultCloseOperation(HIDE_ON_CLOSE);
+				else
+					frame.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+			}
+		});
+		
+		
 		contentPane = new JPanel(new BorderLayout());
 		
 		JTextField field = createTextField();
@@ -256,7 +273,9 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 		clienteTextArea =  new JTextArea(cliente.getNombre()+"\n"
 										+"CIF: "+cliente.getCif()+"\n"
 										+"CODIGO CLIENTE: "+cliente.getCodigo()+"\n"
-										+"DIRECCION:\n" +cliente.getDireccs());	
+										+"DIRECCION:\n" +cliente.getDireccs()+"\n"+
+										cliente.getCp()+" - "+cliente.getPoblacion()+"\n"+
+										cliente.getProvincia()+"\n"+"Contacto: "+cliente.getContact()+"\n");	
 		clienteTextArea.setLineWrap(true);
 		clienteTextArea.setMinimumSize(new Dimension(320,150));
 		clienteTextArea.setPreferredSize(new Dimension(320,150));
@@ -290,6 +309,7 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 		nOfertaTextField = new JTextField();
 		nOfertaTextField.setDocument(new JTextFieldLimit(10));
 		nOfertaTextField.setText(getNumPresu());
+		nOfertaTextField.setEditable(false);
 		nOfertaTextField.setPreferredSize(new Dimension(67,24));
 		nOfertaTextField.setMaximumSize(new Dimension(67,24));
 		nOfertaTextField.setAlignmentX(JComponent.RIGHT_ALIGNMENT);
@@ -925,7 +945,7 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 							String base = baseTextField.getText();
 							String precioiva = ivaTextField.getText();
 							String importeiva = totalTextField.getText();
-							String familia = "06";
+							String familia = "06"; // CAMBIAR
 							String observaciones = obser2TextArea.getText();
 							String cli = cliente.getCodigo();
 							
@@ -943,10 +963,17 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 								dto = getString(rTable.getValueAt(i, 4),1);
 								importe = getString(rTable.getValueAt(i, 5),1);
 								linea = ""+(i+1);
+								
+								double a = Double.parseDouble(precio);
+								a = a + (a*21)/100;
+								double b = Double.parseDouble(importe);
+								b = b + (b*21)/100;
+								String precioivaRow = "" + a;
+								String importeivaRow = "" + b;
 						
 								String sqlD_Presuv = "INSERT d_presuv VALUES ('COMERCIAL#"+usuario+"','"+Tasc.EMPRESA+"','"+nOfertaTextField.getText()+"',NULL,'"+articulo+"','"+def+"','"
 										+unidades+"','"+precio+"','"+dto+"','0','"+importe+"','"+tipo_iva+"','0.000000','0.000000','"+coste+"','','"+linea+"','"
-										+cli+"','"+precioiva+"','"+importeiva+"','0','"+familia+"','0','"+precio+"','"
+										+cli+"','"+precioivaRow+"','"+importeivaRow+"','0','"+familia+"','0','"+precio+"','"
 										+importe+"','0','0.0000','1','0.0000','0','','','','"+importeiva+"','"+precioiva+"','0','','','','','','','','0.00',"
 										+ "'','0','','','0.000000','0.000000')";
 																
@@ -1041,7 +1068,8 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 				base += importe;
 				
 			}
-			tipoIVA = Integer.parseInt(tipoIvaTextField.getText());
+			//tipoIVA = Integer.parseInt(tipoIvaTextField.getText());
+			tipoIVA = 21;
 			iva = (base * tipoIVA)/100;
 			total = base + iva;
 			DecimalFormat df = new DecimalFormat("##0.00");

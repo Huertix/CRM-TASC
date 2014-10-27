@@ -3,6 +3,7 @@ package formularios;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.event.*;
+import java.awt.Window;
 import java.awt.print.PrinterException;
 
 import javax.swing.AbstractAction;
@@ -45,6 +46,7 @@ import javax.swing.text.NumberFormatter;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.PlainDocument;
+import javax.swing.*;
 
 import clases.BaseDatos;
 import clases.Cliente;
@@ -123,6 +125,7 @@ public class ModificarPresupuesto extends JFrame implements ActionListener {
 	private  BaseDatos bd;
 	private String numerOferta;
 	private JTable tableImported;
+	private boolean isFrameVisible = true;
 
 
 	/**
@@ -139,8 +142,27 @@ public class ModificarPresupuesto extends JFrame implements ActionListener {
 		tableImported = t;
 		setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		setTitle("MODIFICAR PRESUPUESTO - CRM TASC");
+		setBounds(100, 100, 600, 500);
 		
-		setBounds(100, 100, 700, 600);
+	
+		
+		addWindowListener( new WindowAdapter(){
+			public void windowClosing(WindowEvent e){
+		
+				JFrame frame = (JFrame)e.getSource();
+		
+				int result = JOptionPane.showConfirmDialog(frame,
+						"¿Seguro Desea Abandonar la Aplicación?\n Los datos introducidos podrían perdese",
+						"Abandonar Ventana",JOptionPane.YES_NO_OPTION);
+				if(result == JOptionPane.YES_OPTION)
+					frame.setDefaultCloseOperation(HIDE_ON_CLOSE);
+				else
+					frame.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+			}
+		});
+		
+		
+		
 		contentPane = new JPanel(new BorderLayout());
 		
 		
@@ -294,9 +316,15 @@ public class ModificarPresupuesto extends JFrame implements ActionListener {
 		panel2.add(nOfertaLabel);
 		
 		nOfertaTextField = new JTextField();
-		nOfertaTextField.setDocument(new JTextFieldLimit(10));
-		//nOfertaTextField.setText(getNumPresu());
-		nOfertaTextField.setText(numerOferta);
+		//nOfertaTextField.setDocument(new JTextFieldLimit(10));
+		
+		String n = getNumPresu(oferta);
+		if(n==null){
+			isFrameVisible = false;
+		}
+		nOfertaTextField.setText(n);
+		
+		nOfertaTextField.setEditable(false);
 		System.out.println("nOferta: "+ numerOferta);
 		nOfertaTextField.setPreferredSize(new Dimension(67,24));
 		nOfertaTextField.setMaximumSize(new Dimension(67,24));
@@ -589,7 +617,7 @@ public class ModificarPresupuesto extends JFrame implements ActionListener {
 		updateButton.doClick();
 		updateRTable();
 		pack();
-        setVisible(true);
+        setVisible(isFrameVisible);
 
 	}
 	
@@ -901,9 +929,11 @@ public class ModificarPresupuesto extends JFrame implements ActionListener {
 							String base = baseTextField.getText();
 							String precioiva = ivaTextField.getText();
 							String importeiva = totalTextField.getText();
-							String familia = "06";
+							String familia = "00"; // CAMBIAR
 							String observaciones = obser2TextArea.getText();
 							String cli = cliente.getCodigo();
+							
+							
 							
 							base = checkDecimalString(base);
 							precioiva = checkDecimalString(precioiva);
@@ -919,10 +949,21 @@ public class ModificarPresupuesto extends JFrame implements ActionListener {
 								dto = getString(""+rTable.getValueAt(i, 4),1);
 								importe = getString(""+rTable.getValueAt(i, 5),1);
 								linea = ""+(i+1);
+								
+								double a = Double.parseDouble(precio);
+								a = a + (a*21)/100;
+								double b = Double.parseDouble(importe);
+								b = b + (b*21)/100;
+								String precioivaRow = "" + a;
+								String importeivaRow = "" + b;
+								
+								
+								
+								
 						
-								String sqlD_Presuv = "INSERT d_presuv VALUES ('COMERCIAL#"+usuario+"','"+Tasc.EMPRESA+",'"+nOfertaTextField.getText()+"',NULL,'"+articulo+"','"+def+"','"
+								String sqlD_Presuv = "INSERT d_presuv VALUES ('COMERCIAL#"+usuario+"','"+Tasc.EMPRESA+"','"+nOfertaTextField.getText()+"',NULL,'"+articulo+"','"+def+"','"
 										+unidades+"','"+precio+"','"+dto+"','0','"+importe+"','"+tipo_iva+"','0.000000','0.000000','"+coste+"','','"+linea+"','"
-										+cli+"','"+precioiva+"','"+importeiva+"','0','"+familia+"','0','"+precio+"','"
+										+cli+"','"+precioivaRow+"','"+importeivaRow+"','0','"+familia+"','0','"+precio+"','"
 										+importe+"','0','0.0000','1','0.0000','0','','','','"+importeiva+"','"+precioiva+"','0','','','','','','','','0.00',"
 										+ "'','0','','','0.000000','0.000000')";
 																
@@ -1032,6 +1073,59 @@ public class ModificarPresupuesto extends JFrame implements ActionListener {
 			ivaTextField.setText(""+df.format(iva));
 			totalTextField.setText(""+df.format(total));
 		}	
+	}
+	
+	
+	
+	private String getNumPresu(String num){
+		
+		//String[] tip = {"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T"};
+		String[] tip = {"A","B"};
+	
+		String valor = "";
+		
+		boolean isFree = false;
+		int i = 0;
+		while(!isFree){
+			
+			String at  = num.trim();	
+			
+			if(at.length()>6)
+				num = num.substring(0, num.length()-1); 
+			
+			//if(i>0)
+				//num = num.substring(0, num.length());
+			
+			if(i==tip.length){
+				JOptionPane.showMessageDialog(null,"Se ha superado las modificaciones permitidas\n"
+						+"Cree un nuevo presupuesto", "INFO", JOptionPane.INFORMATION_MESSAGE);
+				
+				
+				return null;
+				
+			}
+				
+				
+				
+				
+			valor = num.trim()+tip[i];
+			String sql = "SELECT numero FROM c_presuv WHERE numero = '   "+valor+"'";
+			
+			ResultSet a = bd.Consultar(sql);
+			
+			try {
+				if(a.next())
+					i++;
+				else
+					isFree = true;
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+		
+		return "   "+valor;
 	}
 	
 	

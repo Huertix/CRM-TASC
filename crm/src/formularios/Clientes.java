@@ -64,6 +64,8 @@ public class Clientes extends JFrame {
 	private final JComboBox contactoComboBox;
 	private Cliente cliente;
 	private String vendedorID;
+	private int rsLines;
+	private ResultSet rsFCli;
 
 	/**
 	 * Create the frame.
@@ -98,16 +100,40 @@ public class Clientes extends JFrame {
 					
 					try {	
 						
-						rs.absolute(row);
-						codigoField.setText(rs.getString("codigo"));
-						direccionField.setText(rs.getString("direccion"));
-						cifField.setText(rs.getString("cif"));
-						cpField.setText(rs.getString("codpost"));
-
-						poblacionField.setText(rs.getString("poblacion"));
-						provinciaField.setText(rs.getString("provincia"));				
-						obserField.setText(rs.getString("observacio"));
-						creditoField.setText(rs.getString("credito"));
+						ResultSet aux = null;
+						if(row > rsLines){
+							System.out.println("lines:"+ rsLines);
+							System.out.println("row:"+ row);
+							System.out.println("lines-row:"+ (row-rsLines));
+							rsFCli.absolute(row-rsLines);
+							aux = rsFCli;
+							System.out.println("rsFCli");
+							
+						}
+						else{
+							rs.absolute(row);
+							aux = rs;	
+							obserField.setText(aux.getString("observacio"));
+							creditoField.setText(aux.getString("credito"));
+							System.out.println("rs" +row);
+							System.out.println("rs" +aux.getString("tipo_iva"));
+							//cliente.setTipoIVA(aux.getString("tipo_iva"));
+							
+						}
+						
+						System.out.println("bueno");
+						codigoField.setText(aux.getString("codigo"));
+						System.out.println("bueno1");
+						direccionField.setText(aux.getString("direccion"));
+						System.out.println("bueno2");
+						cifField.setText(aux.getString("cif"));
+						System.out.println("bueno3");
+						cpField.setText(aux.getString("codpost"));
+						System.out.println("bueno4");
+						poblacionField.setText(aux.getString("poblacion"));
+						System.out.println("bueno5");
+						provinciaField.setText(aux.getString("provincia"));				
+						
 						
 						cliente = new Cliente(codigoField.getText(),st);
 						cliente.setCp(cpField.getText());
@@ -117,23 +143,28 @@ public class Clientes extends JFrame {
 						cliente.setObser(obserField.getText());
 						cliente.setCredit(creditoField.getText());
 						cliente.setCif(cifField.getText());
-						cliente.setTipoIVA(rs.getString("tipo_iva"));
+						System.out.println("bueno6");
 
-						// Insertamos contactos en contactoComboBox
-						String sql = "SELECT * FROM cont_cli WHERE cliente = "+codigoField.getText()+" ORDER BY persona";
-						auxrs = bd.Consultar(sql);
-						contactoComboBox.removeAllItems();
-						while(auxrs.next()){
-							
-							String auxname = auxrs.getString("persona")+auxrs.getString("telefono")+auxrs.getString("email");						
-							System.out.println(auxname);
-							contactoComboBox.addItem(auxname);
-							}
-						sql = "SELECT nombre FROM fpag WHERE codigo = '"+rs.getString(24)+"'";
-						auxrs = bd.Consultar(sql);
-						if(auxrs.next())
-							cliente.setFormaPago(auxrs.getString("nombre"));
-						
+						if(row < rsLines){
+							// Insertamos contactos en contactoComboBox
+							String sql = "SELECT * FROM cont_cli WHERE cliente = "+codigoField.getText()+" ORDER BY persona";
+							auxrs = bd.Consultar(sql);
+							contactoComboBox.removeAllItems();
+							while(auxrs.next()){
+								
+								String auxname = auxrs.getString("persona")+auxrs.getString("telefono")+auxrs.getString("email");						
+								System.out.println(auxname);
+								contactoComboBox.addItem(auxname);
+								}
+							sql = "SELECT nombre FROM fpag WHERE codigo = '"+rs.getString(24)+"'";
+							auxrs = bd.Consultar(sql);
+							if(auxrs.next())
+								cliente.setFormaPago(auxrs.getString("nombre"));
+						}
+						else{
+							contactoComboBox.removeAllItems();
+							contactoComboBox.addItem(aux.getString("contacto")+aux.getString("telefono"));
+						}
 						
 					} catch (SQLException e) {
 						// TODO Auto-generated catch block
@@ -152,24 +183,44 @@ public class Clientes extends JFrame {
 
 		
 		String sql = "SELECT * FROM clientes WHERE vendedor = '"+vendedorID+"' ORDER BY nombre";
+		String sqlFCli = "SELECT * FROM prclient WHERE vendedor = '"+vendedorID+"' ORDER BY nombre";
 		rs = bd.Consultar(sql);
+		rsFCli = bd.Consultar(sqlFCli);
+		
+		System.out.println("Hola"+sqlFCli);
+		
 		try{
-	
+			rsLines = 0;
 			while(rs.next()){
 
 				Integer row = rs.getRow();
 				String name = rs.getString("nombre");
 				hTable.put(name, row);
 				clienteComboBox.addItem(name);
+				rsLines++;
 				}
+			
+			clienteComboBox.addItem("---------FUTUROS CLIENTES---------");
+			//rsLines += 1;// + 1 Porque le sumo la linea en el comboBox de aqui arriba.
+			int a = 0;
+			while(rsFCli.next()){
+				//System.out.println(++a);
+				Integer row = rsFCli.getRow();
+				String name = rsFCli.getString("nombre");		
+				hTable.put(name, row+rsLines);
+				System.out.println("LINEAS"+(row+rsLines));
+				clienteComboBox.addItem(name);
+			}
+			
+			
 			
 		}
 		catch(SQLException ex){
-			JOptionPane.showMessageDialog(null, "Fallo Boto: " + ex.getMessage() ,"Error",JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, "Fallo SQL: " + ex.getMessage() ,"Error",JOptionPane.ERROR_MESSAGE);
 			
 		}
 		catch(Exception ex){
-			JOptionPane.showMessageDialog(null, "Fallo Conexión boton","Error",JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, "Fallo: " + ex.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);
 		}
 		
 		clienteComboBox.setBounds(12, 30, 540, 24);

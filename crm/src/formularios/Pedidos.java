@@ -24,6 +24,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -74,7 +75,7 @@ public class Pedidos extends JFrame {
 		
 		setTitle("CRM TASC - VISOR PEDIDOS");
 		setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);	
-		setBounds(0, 0, 1000, 700);
+		setBounds(0, 0, 1000, 730);
 		setLocationRelativeTo(null);
 	
 		contentPane = new JPanel();
@@ -118,7 +119,7 @@ public class Pedidos extends JFrame {
 					st = String.format("%10s",st);
 					
 					System.out.println(st);
-					String sql = "SELECT articulo,definicion,unidades,precio,importe,tipo_iva,importeiva FROM d_pedive  WHERE numero = '"+st+"'"; 
+					String sql = "SELECT articulo,unidades,definicion,precio,dto1,importe,tipo_iva,importeiva FROM d_pedive  WHERE numero = '"+st+"'"; 
 					
 					String sqlFecha = "SELECT c_pedive.fecha FROM d_pedive,c_pedive WHERE d_pedive.numero = c_pedive.numero AND d_pedive.numero = '"+st+"'";
 					
@@ -127,8 +128,20 @@ public class Pedidos extends JFrame {
 						// Consulta la Fecha del Presuspuesto
 						ResultSet rs = bd.Consultar(sqlFecha);
 						rs.next();
-						String fecha = rs.getString("fecha");
-						jFecha.setText("FECHA:  "+fecha.substring(0, 10));
+						String  fecha = rs.getString("fecha");
+						fecha = fecha.substring(0, 10);
+						
+						SimpleDateFormat fromDate = new SimpleDateFormat("yyyy-MM-dd");
+						SimpleDateFormat toDate = new SimpleDateFormat("dd-MM-yyyy");
+						
+						try {
+							fecha = toDate.format(fromDate .parse(fecha));
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
+						jFecha.setText("FECHA:  "+fecha);
 						
 						// Comprueba si el presupuesto corresponde a pedido
 						/*rs = bd.Consultar(sqlTrans);
@@ -278,11 +291,12 @@ public class Pedidos extends JFrame {
 		contentPane.add(ivaLabel);
 		
 		
-		modelo.addColumn("ARTÍCULO");
-		modelo.addColumn("DEFINICIÓN");
-		modelo.addColumn("UNIDADES");
+		modelo.addColumn("REFERENCIA");
+		modelo.addColumn("CANTIDAD");
+		modelo.addColumn("DESCRIPCION");
 		modelo.addColumn("PRECIO");
-		modelo.addColumn("IMPORTE");
+		modelo.addColumn("DTO");
+		modelo.addColumn("TOTAL");
 		JScrollPane scrollPane = new JScrollPane(tabla);
 		scrollPane.setBounds(20, 70, 960, 570);
 		contentPane.add(scrollPane);
@@ -292,14 +306,14 @@ public class Pedidos extends JFrame {
 	}
 	
 	
-	
 	// Contruye la Tabla de datos JTable
 	public void  parseData(ResultSet rs) throws SQLException, ParserConfigurationException{
 
 		
 		ResultSetMetaData metaDatos = rs.getMetaData();
 		
-		int numeroColumnas = metaDatos.getColumnCount();
+		//int numeroColumnas = metaDatos.getColumnCount();
+		int numeroColumnas = 6;
 
 		DecimalFormat df = new DecimalFormat(",##0.##");
 		Double value = 0.00;

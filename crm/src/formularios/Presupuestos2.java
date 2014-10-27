@@ -14,6 +14,7 @@ package formularios;
 
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -23,7 +24,9 @@ import java.math.RoundingMode;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -32,8 +35,10 @@ import java.util.Date;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -94,7 +99,7 @@ public class Presupuestos2 extends JFrame {
 		
 		setTitle("CRM TASC - VISOR DE PRESUPUESTOS");
 		setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);	
-		setBounds(0, 0, 1000, 700);
+		setBounds(0, 0, 1000, 730);
 		setLocationRelativeTo(null);
 	
 		contentPane = new JPanel();
@@ -149,9 +154,18 @@ public class Presupuestos2 extends JFrame {
 						ResultSet rs = bd.Consultar(sqlFecha);
 						rs.next();
 						
-						String fecha = rs.getString("fecha");
+						String  fecha = rs.getString("fecha");
 						fecha = fecha.substring(0, 10);
 						
+						SimpleDateFormat fromDate = new SimpleDateFormat("yyyy-MM-dd");
+						SimpleDateFormat toDate = new SimpleDateFormat("dd-MM-yyyy");
+						
+						try {
+							fecha = toDate.format(fromDate .parse(fecha));
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 						
 						jFecha.setText("FECHA:  "+fecha);
 						
@@ -322,9 +336,10 @@ public class Presupuestos2 extends JFrame {
 		updateButton.setBounds(780, 17, 180, 40);
 		contentPane.add(updateButton);
 		
-		
+		numeroComboBox.setBounds(20, 34, 105, 24);
+		numeroComboBox.setAlignmentX(JComponent.RIGHT_ALIGNMENT);	
 		contentPane.add(numeroComboBox);
-		numeroComboBox.setBounds(20, 34, 143, 24);
+		//numeroComboBox.setBounds(20, 34, 143, 24);
 		
 		
 
