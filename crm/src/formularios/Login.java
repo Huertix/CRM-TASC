@@ -21,7 +21,7 @@ import java.awt.Color;
 
 import javax.swing.ImageIcon;
 
-import org.eclipse.swt.graphics.Image;
+
 
 import clases.BaseDatos;
 

@@ -9,11 +9,15 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.JLabel;
 import javax.swing.JButton;
 
+import com.itextpdf.text.DocumentException;
+
 import clases.BaseDatos;
+import clases.ToPDF;
 
 import java.awt.Font;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.io.IOException;
 
 public class Hall extends JFrame {
 
@@ -54,9 +58,20 @@ public class Hall extends JFrame {
 		contentPane.add(clientesButton);
 		
 		JButton presuButton = new JButton("VENTAS");
+		presuButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				/*ToPDF pdf = new ToPDF();
+				try {
+					pdf.createPDF();
+				} catch (IOException | DocumentException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}*/
+			}
+		});
 		presuButton.setFont(new Font("Arial", Font.BOLD, 20));
 		presuButton.setBounds(65, 250, 170, 70);
-		presuButton.setEnabled(false);
+		//presuButton.setEnabled(false);
 		contentPane.add(presuButton);
 		
 		JButton visitasButton = new JButton("VISITAS");

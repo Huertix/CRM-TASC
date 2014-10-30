@@ -83,6 +83,7 @@ public class Presupuestos2 extends JFrame {
 	private double importeiva;
 	private String iva = "";
 	private JButton modButton;
+	private JButton presCopButton;
 	private JButton printButton;
 	private Cliente cliente;
 	private String numerOferta;
@@ -315,6 +316,7 @@ public class Presupuestos2 extends JFrame {
 					rs = bd.Consultar(sql);
 					
 					modButton.setEnabled(true);
+					//presCopButton.setEnabled(true);
 					
 					while(rs.next()){
 						String numero = rs.getString("numero");
@@ -389,6 +391,24 @@ public class Presupuestos2 extends JFrame {
 		modButton.setEnabled(false);
 		contentPane.add(modButton);
 		
+		
+		presCopButton = new JButton("COPIA");
+		presCopButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+			
+				try {
+					NuevoPresupuesto mp = new NuevoPresupuesto(tabla,vendedorID, cliente,bd);
+					setVisible(false);
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		});
+		presCopButton.setBounds(170, 650, 120, 30);
+		presCopButton.setEnabled(false);
+		contentPane.add(presCopButton);
+		
 		printButton = new JButton("IMPRIMIR");
 		printButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -396,7 +416,7 @@ public class Presupuestos2 extends JFrame {
 				
 			}
 		});
-		printButton.setBounds(200, 650, 100, 30);
+		printButton.setBounds(310, 650, 120, 30);
 		printButton.setEnabled(false);
 		contentPane.add(printButton);
 		
@@ -409,14 +429,14 @@ public class Presupuestos2 extends JFrame {
 		contentPane.add(importeIvaLabel);
 			
 		importeLabel = new JLabel("BASE   "+importe);
-		importeLabel.setBounds(400, 650, 250, 24);
+		importeLabel.setBounds(450, 650, 250, 24);
 		importeLabel.setHorizontalAlignment(SwingConstants.LEFT);
 		importeLabel.setFont(new Font("Arial", Font.BOLD, 18));
 		contentPane.add(importeLabel);
 		
 
-		ivaLabel = new JLabel("IVA   "+iva);
-		ivaLabel.setBounds(630, 650, 150, 24);
+		ivaLabel = new JLabel("IVA "+iva);
+		ivaLabel.setBounds(650, 650, 150, 24);
 		ivaLabel.setHorizontalAlignment(SwingConstants.LEFT);
 		ivaLabel.setFont(new Font("Arial", Font.BOLD, 18));
 		contentPane.add(ivaLabel);

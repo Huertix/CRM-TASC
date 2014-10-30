@@ -48,7 +48,9 @@ import javax.swing.text.PlainDocument;
 
 import clases.BaseDatos;
 import clases.Cliente;
+import clases.Presupuesto;
 import clases.Tasc;
+import clases.ToPDF;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -70,6 +72,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.EventObject;
 
+import com.itextpdf.text.DocumentException;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.RowSpec;
@@ -81,6 +84,7 @@ import javax.swing.JLabel;
 import org.jdesktop.swingx.JXDatePicker;
 
 import java.awt.Component;
+import java.io.IOException;
 
 
 public class NuevoPresupuesto extends JFrame implements ActionListener { 
@@ -121,18 +125,20 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 	private JRadioButton nombreRadioButton;
 	private JRadioButton codigoRadioButton;
 	private  BaseDatos bd;
+	private JTable tableImported;
 
 
 	/**
 	 * Create the frame.
 	 * @throws SQLException 
 	 */
-	public NuevoPresupuesto(String ID, Cliente cliente,BaseDatos b) throws SQLException {
+	public NuevoPresupuesto(JTable t, String ID, Cliente cliente,BaseDatos b) throws SQLException {
 		
 		
 		bd = b;
 		this.usuarioID = ID;	
 		this.cliente = cliente;
+		tableImported = t;
 		setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		setTitle("NUEVO PRESUPUESTO - CRM TASC");
 		
@@ -358,23 +364,29 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 					
 	
 		//Define celdas editables Tabla derecha
-		tmr = new DefaultTableModel(){
-		    @Override
-			public boolean isCellEditable(int row, int column)
-		    {
-		        if(column==0 || column==5)
-		        	return false;
-		        else
-		        	return true;
-		    }
-		};
 		
-		tmr.addColumn("REFERENCIA");
-		tmr.addColumn("CANTIDAD");
-		tmr.addColumn("DESCRIPCION");
-		tmr.addColumn("PRECIO");
-		tmr.addColumn("DTO");
-		tmr.addColumn("TOTAL");
+		if(tableImported!=null)
+			tmr = (DefaultTableModel) tableImported.getModel();
+		
+		else{
+			tmr = new DefaultTableModel(){
+			    @Override
+				public boolean isCellEditable(int row, int column)
+			    {
+			        if(column==0 || column==5)
+			        	return false;
+			        else
+			        	return true;
+			    }
+			};
+			
+			tmr.addColumn("REFERENCIA");
+			tmr.addColumn("CANTIDAD");
+			tmr.addColumn("DESCRIPCION");
+			tmr.addColumn("PRECIO");
+			tmr.addColumn("DTO");
+			tmr.addColumn("TOTAL");
+		}
 		
 		int columns = tmr.getColumnCount();
 
@@ -486,7 +498,7 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 		printButton.addActionListener(this);
 		printButton.setAlignmentX(Component.LEFT_ALIGNMENT);
 		printButton.setMaximumSize(new Dimension(250,200));
-		printButton.setEnabled(false);
+		//printButton.setEnabled(false);
 		buttonsRightPanel.add(printButton);
 		
 		saveButton = new JButton("GUARDAR BD");
@@ -749,7 +761,11 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 					String[] file = new String[6];
 					file[0] = rs.getString(1);
 					file[1] = new String("0");	
-					file[2] = rs.getString(2);		
+					//file[2] = rs.getString(2);	
+					JTextFieldLimit jl = new JTextFieldLimit(75);
+					jl.field.setText(rs.getString(2));
+					file[2] = jl.field.getText(); 
+					//rs.getString(2);
 					double p = rs.getBigDecimal(3).doubleValue();
 					
 					file[3] = df.format(p);
@@ -902,7 +918,35 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 			rTable.validate();
 		}
 		
-		else if(e.getActionCommand().equals("IMPRIMIR PDF")){}
+		else if(e.getActionCommand().equals("IMPRIMIR PDF")){
+			Presupuesto pres = new Presupuesto();
+			
+			Date date = fechaJP.getDate();
+			SimpleDateFormat date_format = new SimpleDateFormat("dd/MM/yyyy");
+			String fecha = date_format.format(date); 
+			
+			pres.setFecha(fecha);
+			pres.setnOferta(nOfertaTextField.getText());
+			pres.setBase(baseTextField.getText());
+			pres.setIva(tipoIvaTextField.getText());
+			pres.setTotalIva(ivaTextField.getText());
+			pres.setTotal(totalTextField.getText());
+			pres.setTable(rTable);
+			pres.setCliente(cliente);
+			
+			
+			ToPDF pdf = new ToPDF(pres);
+			
+			try {
+				pdf.createPDF();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (DocumentException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
 		
 		
 		

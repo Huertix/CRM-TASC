@@ -281,7 +281,7 @@ public class FuturoCliente extends JFrame {
 					if(!cliente.isSaved())
 						guardarButton.doClick();
 					if(cliente.isSaved())
-						nps = new NuevoPresupuesto(vendedor,cliente,bd);
+						nps = new NuevoPresupuesto(null,vendedor,cliente,bd);
 					
 				} catch(Exception s){
 					System.out.println("ERROR 1: "+s.getMessage());

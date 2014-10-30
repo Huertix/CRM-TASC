@@ -121,25 +121,25 @@ public class Clientes extends JFrame {
 							
 						}
 						
-						System.out.println("bueno");
+						
 						codigoField.setText(aux.getString("codigo"));
-						System.out.println("bueno1");
+						
 						direccionField.setText(aux.getString("direccion"));
-						System.out.println("bueno2");
+						
 						cifField.setText(aux.getString("cif"));
-						System.out.println("bueno3");
+						
 						cpField.setText(aux.getString("codpost"));
-						System.out.println("bueno4");
+						
 						poblacionField.setText(aux.getString("poblacion"));
-						System.out.println("bueno5");
+						
 						provinciaField.setText(aux.getString("provincia"));				
 						
 						
 						cliente = new Cliente(codigoField.getText(),st);
 						cliente.setCp(cpField.getText());
-						cliente.setDireccs(direccionField.getText()+"\n"
-								+cliente.getCp()+" "+poblacionField.getText()+"\n"
-								+provinciaField.getText());
+						cliente.setDireccs(direccionField.getText());
+						cliente.setPoblacion(poblacionField.getText());
+						cliente.setProvincia(provinciaField.getText());
 						cliente.setObser(obserField.getText());
 						cliente.setCredit(creditoField.getText());
 						cliente.setCif(cifField.getText());
@@ -339,6 +339,9 @@ public class Clientes extends JFrame {
 		lsButton = new JButton("LISTADO PRESUPUESTOS");
 		lsButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				
+			
+				
 				Presupuestos2 ps = new Presupuestos2(codigoField.getText(),vendedorID,cliente,bd);
 				
 			}
@@ -351,7 +354,7 @@ public class Clientes extends JFrame {
 		nuevoButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
-					NuevoPresupuesto nps = new NuevoPresupuesto(vendedorID,cliente,bd);
+					NuevoPresupuesto nps = new NuevoPresupuesto(null, vendedorID,cliente,bd);
 				} catch (SQLException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
