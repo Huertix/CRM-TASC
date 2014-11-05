@@ -50,7 +50,9 @@ import javax.swing.*;
 
 import clases.BaseDatos;
 import clases.Cliente;
+import clases.Presupuesto;
 import clases.Tasc;
+import clases.ToPDF;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -63,6 +65,7 @@ import java.awt.GridBagConstraints;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.CardLayout;
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
@@ -72,6 +75,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.EventObject;
 
+import com.itextpdf.text.DocumentException;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.RowSpec;
@@ -387,7 +391,14 @@ public class ModificarPresupuesto extends JFrame implements ActionListener {
                 
                 if(column==1 || column==3 || column==4){
                     return editor;
-                } else {
+                } 
+                else if(column==2){              	
+                	JTextField e = new JTextField();
+            		e.setDocument(new JTextFieldLimit(76));
+                	return new DefaultCellEditor(e) ;
+                }
+                
+                else {
                     return super.getCellEditor(row, column);
                 }
                
@@ -406,6 +417,28 @@ public class ModificarPresupuesto extends JFrame implements ActionListener {
 		rTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);		
 		rTable.setDragEnabled(true);
 		rTable.setAutoscrolls(true);
+		
+		rTable.addKeyListener(new KeyListener(){
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+				updateRTable();
+				
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+				updateRTable();
+				
+			}
+
+			@Override
+			public void keyTyped(KeyEvent e) {
+				updateRTable();
+				
+			}
+			
+		});
 		
 
 		
@@ -444,16 +477,6 @@ public class ModificarPresupuesto extends JFrame implements ActionListener {
         rTable.getColumnModel().getColumn(5).setCellRenderer(rightRenderer);
        
 
-        
-        enterAction = new EnterAction();
-        
-        rTable.getInputMap().put(KeyStroke.getKeyStroke(" ENTER "), "doEnterAction");
-        rTable.getActionMap().put("doEnterAction", enterAction);
-        
-      
-        
-	
-
 		JScrollPane rTableScrollPane = new JScrollPane(rTable);
 
 		//rTableScrollPane.setViewportView(rTable);
@@ -485,7 +508,7 @@ public class ModificarPresupuesto extends JFrame implements ActionListener {
 		printButton.addActionListener(this);
 		printButton.setAlignmentX(Component.LEFT_ALIGNMENT);
 		printButton.setMaximumSize(new Dimension(250,200));
-		printButton.setEnabled(false);
+		//printButton.setEnabled(false);
 		buttonsRightPanel.add(printButton);
 		
 		saveButton = new JButton("GUARDAR BD");
@@ -716,7 +739,7 @@ public class ModificarPresupuesto extends JFrame implements ActionListener {
 			
 			int totalRows = lTable.getRowCount();
 			int selectedRow = lTable.getSelectedRow();
-			DecimalFormat df = new DecimalFormat("#0.##");
+			DecimalFormat df = new DecimalFormat("#0.00");
 			int selectedRowR = rTable.getSelectedRow();
 	
 			System.out.println(selectedRow);
@@ -767,7 +790,7 @@ public class ModificarPresupuesto extends JFrame implements ActionListener {
 							}
 							else{
 								
-								file[2] = line;
+								file[2] = line.trim();
 															
 								
 								System.out.println("row: "+selectedRowR);
@@ -886,7 +909,39 @@ public class ModificarPresupuesto extends JFrame implements ActionListener {
 			rTable.validate();
 		}
 		
-		else if(e.getActionCommand().equals("IMPRIMIR PDF")){}
+		else if(e.getActionCommand().equals("IMPRIMIR PDF")){
+			
+			Presupuesto pres = new Presupuesto();
+			
+			Date date = fechaJP.getDate();
+			SimpleDateFormat date_format = new SimpleDateFormat("dd/MM/yyyy");
+			String fecha = date_format.format(date); 
+			
+			pres.setFecha(fecha);
+			pres.setnOferta(nOfertaTextField.getText());
+			pres.setBase(baseTextField.getText());
+			pres.setIva(tipoIvaTextField.getText());
+			pres.setTotalIva(ivaTextField.getText());
+			pres.setTotal(totalTextField.getText());
+			pres.setTable(rTable);
+			pres.setCliente(cliente);
+			
+			
+			ToPDF pdf = new ToPDF(pres);
+			
+			try {
+				pdf.createPDF();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (DocumentException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+			
+			
+		}
 		
 		
 		
@@ -957,7 +1012,8 @@ public class ModificarPresupuesto extends JFrame implements ActionListener {
 								String precioivaRow = "" + a;
 								String importeivaRow = "" + b;
 								
-								
+								if(def.length()>74)
+									def = def.substring(0, 74);
 								
 								
 						
@@ -1079,8 +1135,8 @@ public class ModificarPresupuesto extends JFrame implements ActionListener {
 	
 	private String getNumPresu(String num){
 		
-		//String[] tip = {"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T"};
-		String[] tip = {"A","B"};
+		String[] tip = {"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T"};
+		//String[] tip = {"A","B"};
 	
 		String valor = "";
 		

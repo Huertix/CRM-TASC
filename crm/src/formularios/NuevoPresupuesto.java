@@ -132,7 +132,7 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 	 * Create the frame.
 	 * @throws SQLException 
 	 */
-	public NuevoPresupuesto(JTable t, String ID, Cliente cliente,BaseDatos b) throws SQLException {
+	public NuevoPresupuesto(JTable t, String ID, Cliente cliente,BaseDatos b)  throws SQLException {
 		
 		
 		bd = b;
@@ -269,9 +269,7 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 		JPanel rightPanel = new JPanel();
 		rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
 		rightPanel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-		
-		
-		
+	
 		JPanel clientePanel = new JPanel();
 		clientePanel.setMaximumSize(new Dimension(350,180));
 		clientePanel.setBorder(BorderFactory.createTitledBorder("CLIENTE"));
@@ -392,6 +390,8 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 
 			// DEfine tipo de texto admitido en la celdas
 		final TableCellEditor editor = new DefaultCellEditor(field);
+		JTextFieldLimit jl = new JTextFieldLimit(75);
+		final TableCellEditor editorLimited = new DefaultCellEditor(jl.field);
 		rTable = new JTable(tmr){
             @Override
             public TableCellEditor getCellEditor(int row, int column) {
@@ -400,6 +400,13 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
                 if(column==1 || column==3 || column==4){
                     return editor;
                 } 
+                
+                else if(column==2){              	
+                	JTextField e = new JTextField();
+            		e.setDocument(new JTextFieldLimit(76));
+                	return new DefaultCellEditor(e) ;
+                }
+            
                else {
                     return super.getCellEditor(row, column);
                 }
@@ -419,6 +426,27 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 		rTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);		
 		rTable.setDragEnabled(true);
 		rTable.setAutoscrolls(true);
+		rTable.addKeyListener(new KeyListener(){
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+				updateRTable();
+				
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+				updateRTable();
+				
+			}
+
+			@Override
+			public void keyTyped(KeyEvent e) {
+				updateRTable();
+				
+			}
+			
+		});
 		
 
 		
@@ -458,10 +486,9 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
        
 
         
-        enterAction = new EnterAction();
-        
-        rTable.getInputMap().put(KeyStroke.getKeyStroke(" ENTER "), "doEnterAction");
-        rTable.getActionMap().put("doEnterAction", enterAction);
+        //enterAction = new EnterAction();     
+       // rTable.getInputMap().put(KeyStroke.getKeyStroke(" ENTER "), "doEnterAction");
+       // rTable.getActionMap().put("doEnterAction", enterAction);
         
       
         
@@ -746,7 +773,7 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 			
 			int totalRows = lTable.getRowCount();
 			int selectedRow = lTable.getSelectedRow();
-			DecimalFormat df = new DecimalFormat("#0.##");
+			DecimalFormat df = new DecimalFormat("#0.00");
 			int selectedRowR = rTable.getSelectedRow();
 	
 			System.out.println(selectedRow);
@@ -761,11 +788,8 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 					String[] file = new String[6];
 					file[0] = rs.getString(1);
 					file[1] = new String("0");	
-					//file[2] = rs.getString(2);	
-					JTextFieldLimit jl = new JTextFieldLimit(75);
-					jl.field.setText(rs.getString(2));
-					file[2] = jl.field.getText(); 
-					//rs.getString(2);
+					file[2] = rs.getString(2);	
+					
 					double p = rs.getBigDecimal(3).doubleValue();
 					
 					file[3] = df.format(p);
@@ -782,30 +806,56 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 										
 					String line = rs.getString(4);
 					
+
+					line = line.replace("\n", "");			
 					file = new String[6];
-					String[] lines = line.split("\\n");
-					line = "";
-					int len = lines.length;
+					//String[] lines = line.split("\\n");
+					//line = "";
+					//int len = lines.length;
+
 					int nextRow = 1;
 					
+					String[] words = line.split(" ");
+					line = "";
+					int len = words.length;
+					for(int i=0;i<len;i++){
+						if(line.length()+words[i].length()<=75){
+							line = line.concat(" "+words[i]);						
+						}
+						else{							
+							
+							file[2] = line = line.trim();
+							tmr.insertRow(selectedRowR+nextRow,file);
+							line = words[i];
+							nextRow++;					
+						}					
+					}
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					/*
 					
 					
 					for(int i=0;i<len;i++){
+						
 						String[] words = lines[i].split(" ");
 						
 						int len2 = words.length;
 						for(int j=0;j<len2;j++){
 							if(line.length()+words[j].length()<=75){
-								line = line+" "+words[j];
+								line = line.concat(" "+words[j]);
 								
 							}
 							else{
 								
 								file[2] = line;
-															
 								
-								System.out.println("row: "+selectedRowR);
-								System.out.println("Nrow: "+nextRow);
 								tmr.insertRow(selectedRowR+nextRow,file);
 								line = words[j];
 								nextRow++;
@@ -816,7 +866,7 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 						
 						
 						
-					}
+					}*/
 					file = new String[6];
 					tmr.insertRow(selectedRowR+nextRow,file);
 					
@@ -924,7 +974,7 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 			Date date = fechaJP.getDate();
 			SimpleDateFormat date_format = new SimpleDateFormat("dd/MM/yyyy");
 			String fecha = date_format.format(date); 
-			
+
 			pres.setFecha(fecha);
 			pres.setnOferta(nOfertaTextField.getText());
 			pres.setBase(baseTextField.getText());
@@ -1014,7 +1064,14 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 								b = b + (b*21)/100;
 								String precioivaRow = "" + a;
 								String importeivaRow = "" + b;
-						
+								
+								precioivaRow = checkDecimalString(precioivaRow);
+								importeivaRow = checkDecimalString(importeivaRow);
+								
+								if(def.length()>74)
+									def = def.substring(0, 74);
+								
+								
 								String sqlD_Presuv = "INSERT d_presuv VALUES ('COMERCIAL#"+usuario+"','"+Tasc.EMPRESA+"','"+nOfertaTextField.getText()+"',NULL,'"+articulo+"','"+def+"','"
 										+unidades+"','"+precio+"','"+dto+"','0','"+importe+"','"+tipo_iva+"','0.000000','0.000000','"+coste+"','','"+linea+"','"
 										+cli+"','"+precioivaRow+"','"+importeivaRow+"','0','"+familia+"','0','"+precio+"','"
@@ -1084,7 +1141,7 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 		base = 0;
 		
 		int rows = rTable.getRowCount();
-		
+		DecimalFormat df = new DecimalFormat("##0.00");
 		for(int i=0;i<rows;i++){
 			
 			
@@ -1107,7 +1164,7 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 				
 				System.out.println("ROW: "+i+"\n"+"cantidad: "+cantidad.getClass()+"\n"+"precio: "+precio.getClass());
 				
-				rTable.setValueAt(importe, i, 5);
+				rTable.setValueAt(df.format(importe), i, 5);
 				
 				base += importe;
 				
@@ -1116,11 +1173,11 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 			tipoIVA = 21;
 			iva = (base * tipoIVA)/100;
 			total = base + iva;
-			DecimalFormat df = new DecimalFormat("##0.00");
 			
-			baseTextField.setText(""+df.format(base));
-			ivaTextField.setText(""+df.format(iva));
-			totalTextField.setText(""+df.format(total));
+			
+			baseTextField.setText(""+df.format((double)Math.round(base * 100)/100));
+			ivaTextField.setText(""+df.format((double)Math.round(iva * 100)/100));
+			totalTextField.setText(""+df.format((double)Math.round(total * 100)/100));
 		}	
 	}
 	
@@ -1145,6 +1202,8 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
         });
         return field;
     }
+	
+
 	
 
 	

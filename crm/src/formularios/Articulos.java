@@ -11,6 +11,8 @@ import java.nio.charset.CodingErrorAction;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 import java.util.Vector;
@@ -232,6 +234,14 @@ public class Articulos extends JFrame implements ActionListener {
 			   // Se rellena cada posición del array con una de las columnas de la tabla en base de datos.
 			   for (int i=0;i<numeroColumnas;i++){
 			      fila[i] = rs.getObject(i+1); // El primer indice en rs es el 1, no el cero, por eso se suma 1.
+			      
+			      if(i==2){
+			    	  
+			    	  NumberFormat formatter = new DecimalFormat("#0.0000");     
+			    	  fila[i] = formatter.format(fila[i]);
+			    	  
+			      }
+			      
 			      modelo.isCellEditable(rs.getRow(), i+1);
 			     
 			   }

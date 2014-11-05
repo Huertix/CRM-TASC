@@ -276,6 +276,10 @@ public class ToPDF{
 
 	    
 		PdfPCell cell = new PdfPCell(new Phrase("",new Font(FontFamily.HELVETICA, 9)));
+		cell.setPadding(-2);
+	    cell.setPaddingTop(-1);
+	    cell.setPaddingBottom(-1);
+	    cell.setExtraParagraphSpace(-4);
 	    int itemNumber = 1;//
 	    
 	    int rows = tableOri.getModel().getRowCount();
@@ -284,8 +288,7 @@ public class ToPDF{
 	    	
     		cell.setBorder(0);
 		    String it = ""+tableOri.getValueAt(i, 0);
-		    System.out.println("IT: "+it);
-		    if(!it.contains("null")){
+		    if(!it.contains("null") && !it.trim().equals("")){
 		    	it = ""+itemNumber;
 		    	itemNumber++;
 		    }
@@ -307,8 +310,8 @@ public class ToPDF{
 		    
 		    Phrase descripcion = new Phrase(getString(""+tableOri.getValueAt(i, 2)), new Font(FontFamily.HELVETICA, 8));
 		    cell.setPhrase(descripcion);
-		    cell.setNoWrap(true);
 		    cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+		    cell.setExtraParagraphSpace(4);
 		    table.addCell(cell);
 		    
 		    Phrase precioU = new Phrase(getString(""+tableOri.getValueAt(i, 3)), new Font(FontFamily.HELVETICA, 9));

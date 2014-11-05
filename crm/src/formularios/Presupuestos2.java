@@ -18,6 +18,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
@@ -26,6 +27,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -61,8 +63,12 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.jdesktop.swingx.JXDatePicker;
 
+import com.itextpdf.text.DocumentException;
+
 import clases.BaseDatos;
 import clases.Cliente;
+import clases.Presupuesto;
+import clases.ToPDF;
 
 public class Presupuestos2 extends JFrame {
 
@@ -168,7 +174,7 @@ public class Presupuestos2 extends JFrame {
 							e.printStackTrace();
 						}
 						
-						jFecha.setText("FECHA:  "+fecha);
+						jFecha.setText(fecha);
 						
 						// Comprueba si el presupuesto corresponde a pedido
 						/*rs = bd.Consultar(sqlTrans);
@@ -203,7 +209,7 @@ public class Presupuestos2 extends JFrame {
 			public boolean isCellEditable(int row, int column)
 		    {
 		        if(column==0 || column==5)
-		        	return false;
+		        	return false;  
 		        else
 		        	return true;
 		    }
@@ -231,7 +237,14 @@ public class Presupuestos2 extends JFrame {
 	            
 	            if(column==1 || column==3 || column==4){
 	                return editor;
-	            } else {
+	            }
+	            else if(column==2){              	
+                	JTextField e = new JTextField();
+            		e.setDocument(new JTextFieldLimit(76));
+                	return new DefaultCellEditor(e) ;
+                }
+	            
+	            else {
 	                return super.getCellEditor(row, column);
 	            }
 	           
@@ -412,12 +425,38 @@ public class Presupuestos2 extends JFrame {
 		printButton = new JButton("IMPRIMIR");
 		printButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				Presupuesto pres = new Presupuesto();
+				
+				DecimalFormat df = new DecimalFormat("#,###.##");
+				String fecha =  jFecha.getText();
+				
+				pres.setFecha(fecha);
+				pres.setnOferta(numerOferta);
+				pres.setBase(String.valueOf(df.format((double)Math.round(importe * 100)/100)));
+				pres.setIva(String.valueOf(iva));
+				pres.setTotalIva(String.valueOf(df.format((double)Math.round((importeiva-importe)*100)/100)));
+				pres.setTotal(String.valueOf(df.format((double)Math.round(importeiva*100)/100)));
+				pres.setTable(tabla);
+				pres.setCliente(cliente);
+				
+				
+				ToPDF pdf = new ToPDF(pres);
+				
+				try {
+					pdf.createPDF();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (DocumentException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			
 				
 			}
 		});
 		printButton.setBounds(310, 650, 120, 30);
-		printButton.setEnabled(false);
+		//printButton.setEnabled(false);
 		contentPane.add(printButton);
 		
 		
@@ -460,6 +499,7 @@ public class Presupuestos2 extends JFrame {
 		//int numeroColumnas = metaDatos.getColumnCount();
 		int numeroColumnas = 6;
 
+		NumberFormat formatter = new DecimalFormat("#0.0000");  
 		DecimalFormat df = new DecimalFormat("#,###.##");
 		Double value = 0.00;
 		String resultImporte ="";
@@ -487,7 +527,6 @@ public class Presupuestos2 extends JFrame {
 			   String a = rs.getString(i+1);
 			   
 			   if(iva.trim().equals("")){
-				   System.out.println("SI");
 				   this.iva = rs.getString("tipo_iva");
 			   }
 			   
@@ -503,8 +542,25 @@ public class Presupuestos2 extends JFrame {
 				   fila[4]="";
 			   }
 			   
+			   if(i==1){
+				   String s = (String) fila[i];
+				   if(!s.equals("")){
+					   Double d = Double.parseDouble(s);
+					   fila[i] = String.format("%-15s", d);
+				   }
+				  
+			   }
 			   
+			   if(i==3 || i==5){
+				   String s = (String) fila[i];
+				   if(!s.equals("")){
+					   Double d = Double.parseDouble(s);
+					   fila[i] = String.format("%-15.4f", d);
+				   }
+
+			   }
 			   
+			  
 			   
 			   /* 
 			   Object a = rs.getObject(i+1);
@@ -563,6 +619,30 @@ public class Presupuestos2 extends JFrame {
         });
         return field;
     }
+	
+	private class JTextFieldLimit extends PlainDocument{
+		private int limit;
+		private JTextField field = new JTextField();
+
+		JTextFieldLimit(int limit){
+			super();
+			this.limit = limit;
+		}
+		
+		JTextFieldLimit(int limit, boolean upper){
+			super();
+			this.limit = limit;
+		}
+		
+		public void insertString(int offset, String str, AttributeSet attr) throws BadLocationException{
+			if( str == null)
+				return;
+			
+			if((getLength()+ str.length()) <= limit){
+				super.insertString(offset, str, attr);
+			}
+		}
+	}
 
 }
 

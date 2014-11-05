@@ -96,7 +96,7 @@ public class Clientes extends JFrame {
 					lsButton.setEnabled(true);
 					nuevoButton.setEnabled(true);
 					pedidosButton.setEnabled(true);
-					albButton.setEnabled(true);
+					//albButton.setEnabled(true);
 					
 					try {	
 						
@@ -325,7 +325,7 @@ public class Clientes extends JFrame {
 		creditoLabel.setBounds(610, 150, 150, 24);
 		panelCliente.add(creditoLabel);
 		
-		futuroCliButton = new JButton("NUEVO FUTURO CLIENTE");
+		futuroCliButton = new JButton("FUTURO CLIENTE");
 		futuroCliButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				FuturoCliente ps = new FuturoCliente(vendedorID,bd);
@@ -377,7 +377,7 @@ public class Clientes extends JFrame {
 		pedidosButton.setEnabled(false);
 		panelCliente.add(pedidosButton);
 		
-		albButton = new JButton("ALBARANES");
+		albButton = new JButton("ALB / FACT");
 		albButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				Albaranes a = new Albaranes(codigoField.getText(),bd);
