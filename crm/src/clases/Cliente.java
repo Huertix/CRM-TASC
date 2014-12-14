@@ -18,6 +18,8 @@ public class Cliente {
 	private String tipoIVA = "";
 	private String formaPago = "";
 	private String contact = "";
+	private String dto1 = "";
+	private String dto2 = "";
 	private boolean isSaved = false;
 	
 	
@@ -36,6 +38,22 @@ public class Cliente {
 
 	}
 	
+	public String getDto1() {
+		return dto1;
+	}
+
+	public void setDto1(String dto1) {
+		this.dto1 = dto1;
+	}
+
+	public String getDto2() {
+		return dto2;
+	}
+
+	public void setDto2(String dto2) {
+		this.dto2 = dto2;
+	}
+
 	public boolean isSaved() {
 		return isSaved;
 	}
@@ -218,8 +236,7 @@ public class Cliente {
 	
 	public boolean minValues(){
 		if(!nombre.equals("")&&!direccs.equals("")&&
-				!cif.equals("")&&!tlf.equals("")&&
-				!cp.equals("")&&!poblacion.equals("")&&
+				!tlf.equals("")&&!poblacion.equals("")&&
 				!provincia.equals("")&&!contact.equals("")){
 			
 			return true;

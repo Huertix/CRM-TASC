@@ -12,6 +12,7 @@ import javax.swing.JButton;
 import com.itextpdf.text.DocumentException;
 
 import clases.BaseDatos;
+import clases.Tasc;
 import clases.ToPDF;
 
 import java.awt.Font;
@@ -50,7 +51,9 @@ public class Hall extends JFrame {
 		JButton clientesButton = new JButton("CLIENTES");
 		clientesButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				setCursor(Tasc.waitCursor);
 				Clientes clientes = new Clientes(usuarioID, bd);
+				setCursor(Tasc.defCursor);
 			}
 		});
 		clientesButton.setFont(new Font("Arial", Font.BOLD, 20));
@@ -83,7 +86,9 @@ public class Hall extends JFrame {
 		JButton articulosButton = new JButton("ARTICULOS");
 		articulosButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				setCursor(Tasc.waitCursor);
 				Articulos articulos = new Articulos(bd);
+				setCursor(Tasc.defCursor);
 			}
 		});
 		articulosButton.setFont(new Font("Arial", Font.BOLD, 20));

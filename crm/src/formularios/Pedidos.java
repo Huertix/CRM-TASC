@@ -45,6 +45,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.jdesktop.swingx.JXDatePicker;
 
 import clases.BaseDatos;
+import clases.Tasc;
 
 public class Pedidos extends JFrame {
 
@@ -118,12 +119,11 @@ public class Pedidos extends JFrame {
 					//JOptionPane.showMessageDialog(null, st,"ELECCION",JOptionPane.INFORMATION_MESSAGE);
 					st = String.format("%10s",st);
 					
-					System.out.println(st);
 					String sql = "SELECT articulo,unidades,definicion,precio,dto1,importe,tipo_iva,importeiva FROM d_pedive  WHERE numero = '"+st+"'"; 
 					
 					String sqlFecha = "SELECT c_pedive.fecha FROM d_pedive,c_pedive WHERE d_pedive.numero = c_pedive.numero AND d_pedive.numero = '"+st+"'";
 					
-					//System.out.println(sql);
+
 					try {
 						// Consulta la Fecha del Presuspuesto
 						ResultSet rs = bd.Consultar(sqlFecha);
@@ -142,18 +142,7 @@ public class Pedidos extends JFrame {
 						}
 						
 						jFecha.setText("FECHA:  "+fecha);
-						
-						// Comprueba si el presupuesto corresponde a pedido
-						/*rs = bd.Consultar(sqlTrans);
-						int rows = 0;
-						if (rs.last()){
-							System.out.println("...................1");
-							aceptLabel.setText("ACEPTADO");
-						}
-						else
-							aceptLabel.setText("PENDIENTE");*/
-						
-			
+
 						parseData(bd.Consultar(sql));
 	
 					}			
@@ -185,8 +174,8 @@ public class Pedidos extends JFrame {
 			
 
 			public void actionPerformed(ActionEvent arg0) {
-				
-				
+				setCursor(Tasc.waitCursor);
+	
 				numeroComboBox.removeAllItems();
 				array.removeAll(array);
 				
@@ -197,9 +186,7 @@ public class Pedidos extends JFrame {
 				fechaIni = date_format.format(date);
 				date = fechaFinJP.getDate();
 				fechaFin = date_format.format(date);
-				System.out.println("INI: "+fechaIni);
-				System.out.println("INI: "+fechaFin);
-						
+
 				int a = tabla.getRowCount();
 				if(a>1){
 					DefaultTableModel dm = (DefaultTableModel) tabla.getModel();
@@ -210,7 +197,7 @@ public class Pedidos extends JFrame {
 				String sql = "SELECT c_pedive.numero FROM c_pedive" 
 						 +" WHERE c_pedive.cliente = "+codigo+" AND c_pedive.fecha >= '"+fechaIni+"' AND c_pedive.fecha <= '"+fechaFin+"' ORDER BY c_pedive.fecha";
 				
-				System.out.println(sql);
+
 				try {
 					rs = bd.Consultar(sql);
 					
@@ -230,6 +217,7 @@ public class Pedidos extends JFrame {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} 
+				setCursor(Tasc.defCursor);
 			}
 		});
 		updateButton.setBounds(780, 17, 180, 40);
@@ -339,7 +327,7 @@ public class Pedidos extends JFrame {
 		   for (int i=0;i<numeroColumnas;i++){
 		      
 			   Object a = rs.getObject(i+1);
-			   //System.out.println(a.getClass().getName());
+
 			   if(a.getClass().getName().equals("java.math.BigDecimal")){
 				   if(a.toString().equals("0.000000")){
 					   a="";

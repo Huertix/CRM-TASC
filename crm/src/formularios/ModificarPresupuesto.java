@@ -74,6 +74,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.EventObject;
+import java.util.Locale;
 
 import com.itextpdf.text.DocumentException;
 import com.jgoodies.forms.layout.FormLayout;
@@ -130,6 +131,11 @@ public class ModificarPresupuesto extends JFrame implements ActionListener {
 	private String numerOferta;
 	private JTable tableImported;
 	private boolean isFrameVisible = true;
+	private JLabel dto1Label;
+	private JLabel dto2Label;
+	private static JTextField dto1TextField;
+	private static JTextField dto2TextField;
+
 
 
 	/**
@@ -156,7 +162,7 @@ public class ModificarPresupuesto extends JFrame implements ActionListener {
 				JFrame frame = (JFrame)e.getSource();
 		
 				int result = JOptionPane.showConfirmDialog(frame,
-						"¿Seguro Desea Abandonar la Aplicación?\n Los datos introducidos podrían perdese",
+						"¿Seguro Desea Abandonar la Aplicación?\n Los datos introducidos podrían perderse",
 						"Abandonar Ventana",JOptionPane.YES_NO_OPTION);
 				if(result == JOptionPane.YES_OPTION)
 					frame.setDefaultCloseOperation(HIDE_ON_CLOSE);
@@ -329,7 +335,6 @@ public class ModificarPresupuesto extends JFrame implements ActionListener {
 		nOfertaTextField.setText(n);
 		
 		nOfertaTextField.setEditable(false);
-		System.out.println("nOferta: "+ numerOferta);
 		nOfertaTextField.setPreferredSize(new Dimension(67,24));
 		nOfertaTextField.setMaximumSize(new Dimension(67,24));
 		nOfertaTextField.setAlignmentX(JComponent.RIGHT_ALIGNMENT);
@@ -417,31 +422,8 @@ public class ModificarPresupuesto extends JFrame implements ActionListener {
 		rTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);		
 		rTable.setDragEnabled(true);
 		rTable.setAutoscrolls(true);
-		
-		rTable.addKeyListener(new KeyListener(){
-
-			@Override
-			public void keyPressed(KeyEvent e) {
-				updateRTable();
-				
-			}
-
-			@Override
-			public void keyReleased(KeyEvent e) {
-				updateRTable();
-				
-			}
-
-			@Override
-			public void keyTyped(KeyEvent e) {
-				updateRTable();
-				
-			}
+		rTable.addKeyListener(new MyKeyListener());
 			
-		});
-		
-
-		
 		col = rTable.getColumnModel().getColumn(0);
         col.setPreferredWidth(100);
         col.setMaxWidth(120);
@@ -530,6 +512,36 @@ public class ModificarPresupuesto extends JFrame implements ActionListener {
 		
 		JPanel totalBasePanel = new JPanel();
 		totalBasePanel.setLayout(new BoxLayout(totalBasePanel, BoxLayout.X_AXIS));
+		
+		dto1Label = new JLabel("DTO1");
+		totalBasePanel.add(dto1Label);
+		totalBasePanel.add(Box.createHorizontalStrut(5));
+		dto1TextField = createTextField();
+		dto1TextField.setText(cliente.getDto1());
+		dto1TextField.setPreferredSize(new Dimension(45,24));
+		dto1TextField.setMaximumSize(new Dimension(45,24));
+		dto1TextField.setAlignmentX(Component.LEFT_ALIGNMENT);
+		dto1TextField.addKeyListener(new MyKeyListener());
+
+
+		totalBasePanel.add(dto1TextField);		
+		totalBasePanel.add(Box.createHorizontalStrut(10));
+		dto2Label = new JLabel("DTO2");
+		totalBasePanel.add(dto2Label);
+		totalBasePanel.add(Box.createHorizontalStrut(5));
+		dto2TextField = createTextField();
+		dto2TextField.setText(cliente.getDto2());
+		dto2TextField.setPreferredSize(new Dimension(45,24));
+		dto2TextField.setMaximumSize(new Dimension(45,24));
+		dto2TextField.setAlignmentX(Component.RIGHT_ALIGNMENT);
+		dto2TextField.addKeyListener(new MyKeyListener());
+
+		totalBasePanel.add(dto2TextField);
+		
+		totalBasePanel.add(Box.createHorizontalStrut(10));
+		
+		
+		
 		JLabel baseLabel = new JLabel("BASE ");
 		baseLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		baseTextField = new JTextField(""+base);
@@ -547,11 +559,12 @@ public class ModificarPresupuesto extends JFrame implements ActionListener {
 		tipoIvaLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		tipoIvaTextField = createTextField();
 		tipoIvaTextField.setText("21");
-		tipoIvaTextField.setText(cliente.getTipoIVA());
+		//tipoIvaTextField.setText(cliente.getTipoIVA());
 		tipoIvaTextField.setFont(new Font("Arial", Font.BOLD, 14));
 		tipoIvaTextField.setHorizontalAlignment(JTextField.RIGHT);
 		tipoIvaTextField.setPreferredSize(new Dimension(30,24));
 		tipoIvaTextField.setMaximumSize(new Dimension(30,24));	
+		tipoIvaTextField.addKeyListener(new MyKeyListener());
 		
 		JLabel ivaLabel = new JLabel("IVA ");
 		ivaLabel.setAlignmentX(Component.LEFT_ALIGNMENT);		
@@ -674,14 +687,12 @@ public class ModificarPresupuesto extends JFrame implements ActionListener {
 		    lTable.revalidate();
 		}
 		    
-		System.out.println(sql);
 		
 		    try {
 				rs = bd.Consultar(sql);
 				
 				
 				int columns = tml.getColumnCount();
-				System.out.println(columns);
 				while(rs.next()){
 					
 					Object [] fila = new Object[columns];
@@ -705,10 +716,9 @@ public class ModificarPresupuesto extends JFrame implements ActionListener {
 
 	
 	public void actionPerformed(ActionEvent e) {
-			
-		System.out.println("ActionCommand: "+e.getActionCommand());
 	
 		if(e.getActionCommand().equals("ACTUALIZAR")){
+			setCursor(Tasc.waitCursor);
 			
 			String order = "";
 			String familiaString ="";
@@ -720,19 +730,20 @@ public class ModificarPresupuesto extends JFrame implements ActionListener {
 			}
 			
 			if(nombreRadioButton.isSelected()){
-				order = "articulo.nombre";
-				System.out.println("ORDENAR POR NOMBRE");			
+				order = "articulo.nombre";	
 			}
 			
 			else{
 				order = "articulo.codigo";
-				System.out.println("ORDENAR POR CODIGO");				
+			
 			}
 					
 			String sql = "SELECT articulo.codigo, articulo.nombre, pvp.pvp, articulo.nombre2 FROM articulo, pvp, marcas "
 					+"WHERE articulo.codigo = pvp.articulo AND articulo.marca = marcas.codigo "+familiaString+" ORDER BY "+order;
 			
-			loadLTable(sql);		
+			loadLTable(sql);
+			
+			setCursor(Tasc.defCursor);
 		}
 	
 		else if(e.getActionCommand().equals("AÑADIR ARTICULO")){
@@ -741,12 +752,7 @@ public class ModificarPresupuesto extends JFrame implements ActionListener {
 			int selectedRow = lTable.getSelectedRow();
 			DecimalFormat df = new DecimalFormat("#0.00");
 			int selectedRowR = rTable.getSelectedRow();
-	
-			System.out.println(selectedRow);
-			System.out.println(totalRows);
-			
-			
-			
+
 			if(selectedRow >= 0 && selectedRow  <= totalRows){
 					
 				try {
@@ -791,10 +797,7 @@ public class ModificarPresupuesto extends JFrame implements ActionListener {
 							else{
 								
 								file[2] = line.trim();
-															
-								
-								System.out.println("row: "+selectedRowR);
-								System.out.println("Nrow: "+nextRow);
+
 								tmr.insertRow(selectedRowR+nextRow,file);
 								line = words[j];
 								nextRow++;
@@ -858,22 +861,19 @@ public class ModificarPresupuesto extends JFrame implements ActionListener {
 					   "¿Seguro desea Borrar las lineas seleccionadas?");// "+selectedRow+"?");
 
 					if (JOptionPane.OK_OPTION == confirmado){
-					   System.out.println("confirmado");
-					   
+
 					   int len = selection.length;
-					   System.out.println("len: "+len);
-					   
+
 					   for(int i=len-1;i>=0;i--){
 						   tmr.removeRow(selection[i]);
-						   System.out.println(" Borra fila: "+selection[i]);			  
+			  
 					   }
 					   
 					   rTable.setModel(tmr);
 					   rTable.validate();
 				   
 					}
-					else
-					   System.out.println("vale... no borro nada...");		
+	
 		}
 		
 		
@@ -949,6 +949,9 @@ public class ModificarPresupuesto extends JFrame implements ActionListener {
 			
 		    boolean existe = false;
 		    
+		    setCursor(Tasc.waitCursor);
+		
+		    
 		    String q = "SELECT numero FROM c_presuv WHERE numero = '"+nOfertaTextField.getText()+"'";
 		    
 		    try{
@@ -1023,8 +1026,7 @@ public class ModificarPresupuesto extends JFrame implements ActionListener {
 										+importe+"','0','0.0000','1','0.0000','0','','','','"+importeiva+"','"+precioiva+"','0','','','','','','','','0.00',"
 										+ "'','0','','','0.000000','0.000000')";
 																
-								System.out.println(sqlD_Presuv);
-								
+
 								try{
 									bd.Ingresar(sqlD_Presuv);
 								}
@@ -1038,8 +1040,7 @@ public class ModificarPresupuesto extends JFrame implements ActionListener {
 									+base+"','0','000','1.000000','"+base+"','','','0','0',NULL,'"+fecha+"','0.0000','0.0000','0',"
 											+ "'','','0','','','','','0','0','','1')";
 	
-							System.out.println(sqlC_Presuv);
-							
+
 							try{
 								bd.Ingresar(sqlC_Presuv);
 							}
@@ -1051,7 +1052,8 @@ public class ModificarPresupuesto extends JFrame implements ActionListener {
 			else
 				JOptionPane.showMessageDialog(null, "YA EXISTE ESTE NÚMERO DE PRESUPUESTO");		
 		}
-		else{}    
+		else{}  
+		setCursor(Tasc.defCursor);
 	}
 	
 	private String checkDecimalString(String string){
@@ -1083,52 +1085,77 @@ public class ModificarPresupuesto extends JFrame implements ActionListener {
 	
 	private static void updateRTable(){
 
+		
+		
 		//rTable.print();
+		DecimalFormat df = new DecimalFormat("##0.00");
 		
 		total = 0;
 		iva = 0;
 		base = 0;
+		
+		
+		
 		
 		int rows = rTable.getRowCount();
 		
 		for(int i=0;i<rows;i++){
 			
 			
+			if(dto1TextField.getText().trim().equals(""))
+				dto1TextField.setText("0.00");
+			if(dto2TextField.getText().trim().equals(""))
+				dto2TextField.setText("0.00");
+			
+			Double dt1 = Double.parseDouble(dto1TextField.getText());
+			Double dt2 = Double.parseDouble(dto2TextField.getText());
+			
 			Object check = rTable.getValueAt(i, 0);
 			String check1 = (String) rTable.getValueAt(i, 1);
 			String check2 = (String) rTable.getValueAt(i, 3);
 			String check3 = (String) rTable.getValueAt(i, 4) ;
-			
+				
 			if(check!=null && check1!=null && check2!=null && check3!=null &&
 					check1!="" && check2!="" && check3!=""){
 			
 				Double cantidad = Double.parseDouble(check1);
+				
 				Double precio = Double.parseDouble(check2);
 				Double descuento = Double.parseDouble(check3);
 	
+				//precio = precio - (precio* 0.01 * dt1);
+				
+				//precio = precio - (precio* 0.01 * dt2);
+		
+				//rTable.getValueAt(i, 3);
+				//rTable.getModel().setValueAt(df.format(precio),i,3);
+				
+				
 				Double importe = cantidad * precio;
 				
-				if(descuento > 0){
-					importe = importe-(importe*(descuento/100)); 
-				}
+				//importe = importe-(importe* 0.01 * dt1);
 				
-				
-				System.out.println("ROW: "+i+"\n"+"cantidad: "+cantidad.getClass()+"\n"+"precio: "+precio.getClass());
-				
-				rTable.setValueAt(importe, i, 5);
+				//importe = importe-(importe* 0.01 * dt2);
+								
+				importe = importe-(importe* 0.01 * descuento); 
+
+				rTable.setValueAt(df.format(importe), i, 5);
 				
 				base += importe;
 				
 			}
-			tipoIVA = Integer.parseInt(tipoIvaTextField.getText());
-			iva = (base * tipoIVA)/100;
-			total = base + iva;
-			DecimalFormat df = new DecimalFormat("##0.00");
-			
-			baseTextField.setText(""+df.format(base));
-			ivaTextField.setText(""+df.format(iva));
-			totalTextField.setText(""+df.format(total));
+		
 		}	
+		
+
+		tipoIVA = Integer.parseInt(tipoIvaTextField.getText());
+		iva = (base * tipoIVA)/100;
+		total = base + iva;
+
+	
+		baseTextField.setText(""+df.format(base));
+		ivaTextField.setText(""+df.format(iva));
+		totalTextField.setText(""+df.format(total));
 	}
 	
 	
@@ -1239,8 +1266,29 @@ public class ModificarPresupuesto extends JFrame implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent ac) {
 					
-			System.out.println( "The Enter key has been pressed." );
 			ModificarPresupuesto.updateRTable();
+			
+		}
+		
+	}
+	
+private class MyKeyListener implements KeyListener{
+		
+		@Override
+		public void keyPressed(KeyEvent e) {
+			updateRTable();
+			
+		}
+
+		@Override
+		public void keyReleased(KeyEvent e) {
+			updateRTable();
+			
+		}
+
+		@Override
+		public void keyTyped(KeyEvent e) {
+			updateRTable();
 			
 		}
 		

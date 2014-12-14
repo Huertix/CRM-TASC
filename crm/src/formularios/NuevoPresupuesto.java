@@ -71,6 +71,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.EventObject;
+import java.util.Locale;
 
 import com.itextpdf.text.DocumentException;
 import com.jgoodies.forms.layout.FormLayout;
@@ -126,6 +127,11 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 	private JRadioButton codigoRadioButton;
 	private  BaseDatos bd;
 	private JTable tableImported;
+	private JLabel dto1Label;
+	private JLabel dto2Label;
+	private static JTextField dto1TextField;
+	private static JTextField dto2TextField;
+	private static String dtoPronto;
 
 
 	/**
@@ -354,7 +360,7 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 		ObserPanel.setMaximumSize(new Dimension(380,180));
 		obserTextArea =  new JTextArea(cliente.getObser());	
 		obserTextArea.setLineWrap(true);
-		obserTextArea.setBackground(Color.yellow);
+		obserTextArea.setBackground(Color.white);
 		obserTextArea.setMinimumSize(new Dimension(350,150));
 		obserTextArea.setPreferredSize(new Dimension(350,150));
 		obserTextArea.setMaximumSize(new Dimension(350,150));
@@ -426,27 +432,7 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 		rTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);		
 		rTable.setDragEnabled(true);
 		rTable.setAutoscrolls(true);
-		rTable.addKeyListener(new KeyListener(){
-
-			@Override
-			public void keyPressed(KeyEvent e) {
-				updateRTable();
-				
-			}
-
-			@Override
-			public void keyReleased(KeyEvent e) {
-				updateRTable();
-				
-			}
-
-			@Override
-			public void keyTyped(KeyEvent e) {
-				updateRTable();
-				
-			}
-			
-		});
+		rTable.addKeyListener(new MyKeyListener());
 		
 
 		
@@ -547,6 +533,33 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 		
 		JPanel totalBasePanel = new JPanel();
 		totalBasePanel.setLayout(new BoxLayout(totalBasePanel, BoxLayout.X_AXIS));
+		
+		dto1Label = new JLabel("DTO1");
+		totalBasePanel.add(dto1Label);
+		totalBasePanel.add(Box.createHorizontalStrut(5));
+		dto1TextField = createTextField();
+		dto1TextField.setText(cliente.getDto1());
+		dto1TextField.setPreferredSize(new Dimension(45,24));
+		dto1TextField.setMaximumSize(new Dimension(45,24));
+		dto1TextField.setAlignmentX(Component.LEFT_ALIGNMENT);
+		dto1TextField.addKeyListener(new MyKeyListener());
+
+		totalBasePanel.add(dto1TextField);		
+		totalBasePanel.add(Box.createHorizontalStrut(10));
+		dto2Label = new JLabel("DTO2");
+		totalBasePanel.add(dto2Label);
+		totalBasePanel.add(Box.createHorizontalStrut(5));
+		dto2TextField = createTextField();
+		dto2TextField.setText(cliente.getDto2());
+		dto2TextField.setPreferredSize(new Dimension(45,24));
+		dto2TextField.setMaximumSize(new Dimension(45,24));
+		dto2TextField.setAlignmentX(Component.RIGHT_ALIGNMENT);
+		dto2TextField.addKeyListener(new MyKeyListener());
+
+		totalBasePanel.add(dto2TextField);
+		
+		totalBasePanel.add(Box.createHorizontalStrut(10));
+		
 		JLabel baseLabel = new JLabel("BASE ");
 		baseLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		baseTextField = new JTextField(""+base);
@@ -558,6 +571,9 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 		totalBasePanel.add(baseLabel);
 		totalBasePanel.add(baseTextField);
 		
+
+	
+				
 		JPanel totalIvaPanel = new JPanel();
 		totalIvaPanel.setLayout(new BoxLayout(totalIvaPanel, BoxLayout.X_AXIS));
 		JLabel tipoIvaLabel = new JLabel("TIPO IVA: ");
@@ -568,6 +584,7 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 		tipoIvaTextField.setHorizontalAlignment(JTextField.RIGHT);
 		tipoIvaTextField.setPreferredSize(new Dimension(30,24));
 		tipoIvaTextField.setMaximumSize(new Dimension(30,24));	
+		tipoIvaTextField.addKeyListener(new MyKeyListener());
 		
 		JLabel ivaLabel = new JLabel("IVA ");
 		ivaLabel.setAlignmentX(Component.LEFT_ALIGNMENT);		
@@ -612,7 +629,7 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 		ObserPanel2.setMaximumSize(new Dimension(300,140));
 		obser2TextArea =  new JTextArea();	
 		obser2TextArea.setLineWrap(true);
-		obser2TextArea.setBackground(Color.yellow);
+		obser2TextArea.setBackground(Color.white);
 		obser2TextArea.setMinimumSize(new Dimension(280,110));
 		obser2TextArea.setPreferredSize(new Dimension(280,110));
 		obser2TextArea.setMaximumSize(new Dimension(280,110));
@@ -689,14 +706,11 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 		    lTable.revalidate();
 		}
 		    
-		System.out.println(sql);
-		
 		    try {
 				rs = bd.Consultar(sql);
 				
 				
 				int columns = tml.getColumnCount();
-				System.out.println(columns);
 				while(rs.next()){
 					
 					Object [] fila = new Object[columns];
@@ -731,19 +745,13 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 		return numero;
 	}
 	
-	
-	
-	
 
 	
-	
-	
 	public void actionPerformed(ActionEvent e) {
-			
-		System.out.println("ActionCommand: "+e.getActionCommand());
-	
+
 		if(e.getActionCommand().equals("ACTUALIZAR")){
 			
+			setCursor(Tasc.waitCursor);
 			String order = "";
 			String familiaString ="";
 			
@@ -754,33 +762,29 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 			}
 			
 			if(nombreRadioButton.isSelected()){
-				order = "articulo.nombre";
-				System.out.println("ORDENAR POR NOMBRE");			
+				order = "articulo.nombre";		
 			}
 			
 			else{
-				order = "articulo.codigo";
-				System.out.println("ORDENAR POR CODIGO");				
+				order = "articulo.codigo";			
 			}
 					
 			String sql = "SELECT articulo.codigo, articulo.nombre, pvp.pvp, articulo.nombre2 FROM articulo, pvp, marcas "
 					+"WHERE articulo.codigo = pvp.articulo AND articulo.marca = marcas.codigo "+familiaString+" ORDER BY "+order;
 			
-			loadLTable(sql);		
+			loadLTable(sql);
+			setCursor(Tasc.defCursor);	
 		}
 	
 		else if(e.getActionCommand().equals("AÑADIR ARTICULO")){
 			
+			setCursor(Tasc.waitCursor);	
 			int totalRows = lTable.getRowCount();
 			int selectedRow = lTable.getSelectedRow();
 			DecimalFormat df = new DecimalFormat("#0.00");
+
 			int selectedRowR = rTable.getSelectedRow();
-	
-			System.out.println(selectedRow);
-			System.out.println(totalRows);
-			
-			
-			
+		
 			if(selectedRow >= 0 && selectedRow  <= totalRows){
 					
 				try {
@@ -830,43 +834,7 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 							nextRow++;					
 						}					
 					}
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					/*
-					
-					
-					for(int i=0;i<len;i++){
-						
-						String[] words = lines[i].split(" ");
-						
-						int len2 = words.length;
-						for(int j=0;j<len2;j++){
-							if(line.length()+words[j].length()<=75){
-								line = line.concat(" "+words[j]);
-								
-							}
-							else{
-								
-								file[2] = line;
-								
-								tmr.insertRow(selectedRowR+nextRow,file);
-								line = words[j];
-								nextRow++;
-								
-							}
-							
-						}
-						
-						
-						
-					}*/
+
 					file = new String[6];
 					tmr.insertRow(selectedRowR+nextRow,file);
 					
@@ -890,7 +858,9 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 			}
 			else{
 				JOptionPane.showMessageDialog(null,"SELECT AN  ARTICLE FIRST", "INFO", JOptionPane.INFORMATION_MESSAGE);
-			}		
+			}	
+		
+			setCursor(Tasc.defCursor);	
 		}
 				
 		else if(e.getActionCommand().equals("AÑADIR FILA")){
@@ -917,22 +887,19 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 					   "¿Seguro desea Borrar las lineas seleccionadas?");// "+selectedRow+"?");
 
 					if (JOptionPane.OK_OPTION == confirmado){
-					   System.out.println("confirmado");
 					   
 					   int len = selection.length;
-					   System.out.println("len: "+len);
+
 					   
 					   for(int i=len-1;i>=0;i--){
-						   tmr.removeRow(selection[i]);
-						   System.out.println(" Borra fila: "+selection[i]);			  
+						   tmr.removeRow(selection[i]);			  
 					   }
 					   
 					   rTable.setModel(tmr);
 					   rTable.validate();
 				   
 					}
-					else
-					   System.out.println("vale... no borro nada...");		
+						
 		}
 		
 		
@@ -1007,8 +974,10 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 		    String q = "SELECT numero FROM c_presuv WHERE numero = '"+nOfertaTextField.getText()+"'";
 		    
 		    try{
+		    	setCursor(Tasc.waitCursor);
 		    	ResultSet ofrs = bd.Consultar(q);
 		    	existe = ofrs.next();
+		    	setCursor(Tasc.defCursor);
 		    	
 		    }
 		    catch(Exception e1){
@@ -1022,7 +991,8 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 						   "¿Seguro desea Guardar el presupuesto en la Base de Datos?");// "+selectedRow+"?");
 	
 						if (JOptionPane.OK_OPTION == confirmado){
-							
+							setCursor(Tasc.waitCursor);
+						
 							Date date = fechaJP.getDate();
 							SimpleDateFormat date_format = new SimpleDateFormat("yyyyMMdd");
 							String fecha = date_format.format(date); 
@@ -1078,7 +1048,6 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 										+importe+"','0','0.0000','1','0.0000','0','','','','"+importeiva+"','"+precioiva+"','0','','','','','','','','0.00',"
 										+ "'','0','','','0.000000','0.000000')";
 																
-								System.out.println(sqlD_Presuv);
 								
 								try{
 									bd.Ingresar(sqlD_Presuv);
@@ -1093,7 +1062,7 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 									+base+"','0','000','1.000000','"+base+"','','','0','0',NULL,'"+fecha+"','0.0000','0.0000','0',"
 											+ "'','','0','','','','','0','0','','0')";
 	
-							System.out.println(sqlC_Presuv);
+							
 							
 							try{
 								bd.Ingresar(sqlC_Presuv);
@@ -1101,7 +1070,10 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 							catch(Exception s){
 								System.out.println("ERROR 2: "+s.getMessage());
 							}
+							
 						}
+						setCursor(Tasc.defCursor);
+						
 			}
 			else
 				JOptionPane.showMessageDialog(null, "YA EXISTE ESTE NÚMERO DE PRESUPUESTO");		
@@ -1161,24 +1133,41 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 					importe = importe-(importe*(descuento/100)); 
 				}
 				
-				
-				System.out.println("ROW: "+i+"\n"+"cantidad: "+cantidad.getClass()+"\n"+"precio: "+precio.getClass());
-				
 				rTable.setValueAt(df.format(importe), i, 5);
 				
 				base += importe;
 				
 			}
 			//tipoIVA = Integer.parseInt(tipoIvaTextField.getText());
-			tipoIVA = 21;
-			iva = (base * tipoIVA)/100;
-			total = base + iva;
 			
 			
-			baseTextField.setText(""+df.format((double)Math.round(base * 100)/100));
-			ivaTextField.setText(""+df.format((double)Math.round(iva * 100)/100));
-			totalTextField.setText(""+df.format((double)Math.round(total * 100)/100));
 		}	
+		
+		if(dto1TextField.getText().trim().equals(""))
+			dto1TextField.setText("0.00");
+		if(dto2TextField.getText().trim().equals(""))
+			dto2TextField.setText("0.00");
+		
+		Double dt0;
+		Double dt1 = Double.parseDouble(dto1TextField.getText());
+		Double dt2 = Double.parseDouble(dto2TextField.getText());
+		
+		//base = base - (base* 0.01 * dt1);
+		//base = base - (base* 0.01 * dt2);
+		
+		
+		
+		tipoIVA = Integer.parseInt(tipoIvaTextField.getText());
+		iva = (base * tipoIVA)/100;
+		total = base + iva;
+		
+		dt0 = dt1+(dt1*0.01*dt2);	
+		dtoPronto = ""+dt0;
+		
+		
+		baseTextField.setText(""+df.format((double)Math.round(base * 100)/100));
+		ivaTextField.setText(""+df.format((double)Math.round(iva * 100)/100));
+		totalTextField.setText(""+df.format((double)Math.round(total * 100)/100));
 	}
 	
 	
@@ -1238,8 +1227,29 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent ac) {
 					
-			System.out.println( "The Enter key has been pressed." );
 			NuevoPresupuesto.updateRTable();
+			
+		}
+		
+	}
+	
+	private class MyKeyListener implements KeyListener{
+		
+		@Override
+		public void keyPressed(KeyEvent e) {
+			updateRTable();
+			
+		}
+
+		@Override
+		public void keyReleased(KeyEvent e) {
+			updateRTable();
+			
+		}
+
+		@Override
+		public void keyTyped(KeyEvent e) {
+			updateRTable();
 			
 		}
 		

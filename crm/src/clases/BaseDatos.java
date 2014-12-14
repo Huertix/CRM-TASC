@@ -9,33 +9,90 @@ package clases;
  */
 
 
+
+import java.awt.Cursor;
+import java.io.IOException;
 import java.sql.*;
 
 import javax.swing.JOptionPane;
 
+
+
+
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.Session;
+
 public class BaseDatos {
+	
+	boolean remote;
+	
+	
+	public BaseDatos(){
+		super();
+	}
+	
+	public BaseDatos(boolean isRemote){
+		remote = isRemote;
+	}
+	
 	
 	//Objeto tipo Conexión
 	private Connection conexion = null;
+	private Session session= null;
 	//Conectar
+	
 	private void Conectar(){
+		
+		int lport=49256;
+		//int rport=49231;
+		int rport = 49256;
+		int port = 0;
+		String user="servidor";
+		String password="Tasc2011";
+		String rhost="192.168.1.6\\SQLEXPRES12";
+		//String rhost="127.0.0.1\\SQLEXPRES12";
+		String host="tascsl.myftp.org";
 		
 		try{
 			
-			//Cargar el Driver
-			Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-			conexion = DriverManager.getConnection("jdbc:sqlserver://192.168.1.106\\SQLEXPRES12:49231;databaseNAME=2014LY","comercial","comercial");
-			//JOptionPane.showMessageDialog(null, "Connection: "+!conexion.isClosed(),"Info",JOptionPane.INFORMATION_MESSAGE);
+			if(remote){
+		
+				try{
+				    String comando = "ssh -L 49256:192.168.1.6:49256 servidor@tascsl.myftp.org";
+				    final Process proceso = Runtime.getRuntime().exec(comando);
+				    
+				} catch(IOException e){
+				 
+				}
+	            
+				//Cargar el Driver
+				Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+				conexion = DriverManager.getConnection("jdbc:sqlserver://127.0.0.1\\SQLEXPRES12:49256;databaseNAME=2014LY","comercial","comercial");
+				//JOptionPane.showMessageDialog(null, "Connection: "+!conexion.isClosed(),"Info",JOptionPane.INFORMATION_MESSAGE);
+				
+			}
+
+			else{
+				//Cargar el Driver
+				Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+				conexion = DriverManager.getConnection("jdbc:sqlserver://192.168.1.6\\SQLEXPRES12:49256;databaseNAME=2014LY","comercial","comercial");
+				//JOptionPane.showMessageDialog(null, "Connection: "+!conexion.isClosed(),"Info",JOptionPane.INFORMATION_MESSAGE);
+			}
 		}
+		
 		catch(SQLException ex){
-			JOptionPane.showMessageDialog(null, ex.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);
-			
+			JOptionPane.showMessageDialog(null, ex.getMessage(),"SQL Error",JOptionPane.ERROR_MESSAGE);
+			ex.printStackTrace();
 		}
 		catch(Exception ex){
 			JOptionPane.showMessageDialog(null, "Fallo Conexión conector","Error",JOptionPane.ERROR_MESSAGE);
+			ex.printStackTrace();
 		}
 		
 	}
+	
+
 	
 	//Consultar
 	public ResultSet Consultar(String SQL){

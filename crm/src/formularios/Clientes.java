@@ -30,7 +30,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.JButton;
 
-
+import clases.Tasc;
 //xml
 import javax.xml.parsers.*;
 import javax.xml.transform.*;
@@ -39,6 +39,12 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import java.sql.ResultSetMetaData;
+
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.PlainDocument;
+import javax.swing.text.DocumentFilter;
 
 public class Clientes extends JFrame {
 
@@ -66,13 +72,17 @@ public class Clientes extends JFrame {
 	private String vendedorID;
 	private int rsLines;
 	private ResultSet rsFCli;
+	private JLabel dto1Label;
+	private JLabel dto2Label;
+	private JTextField dto1TextField;
+	private JTextField dto2TextField;
 
 	/**
 	 * Create the frame.
 	 */
 	public Clientes(final String ID, BaseDatos b) {
 		this.bd = b;
-		this.vendedorID = ID;
+		this.vendedorID = ID;		
 		hTable = new Hashtable();
 		setTitle("CRM TASC - CLIENTES");
 		setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
@@ -89,6 +99,8 @@ public class Clientes extends JFrame {
 		
 		clienteComboBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				setCursor(Tasc.waitCursor);
+				
 				if( clienteComboBox.getSelectedItem()!=null){
 					String st = clienteComboBox.getSelectedItem().toString();
 					int row = Integer.parseInt(hTable.get(st).toString());
@@ -97,27 +109,20 @@ public class Clientes extends JFrame {
 					nuevoButton.setEnabled(true);
 					pedidosButton.setEnabled(true);
 					//albButton.setEnabled(true);
-					
+				
 					try {	
 						
 						ResultSet aux = null;
 						if(row > rsLines){
-							System.out.println("lines:"+ rsLines);
-							System.out.println("row:"+ row);
-							System.out.println("lines-row:"+ (row-rsLines));
 							rsFCli.absolute(row-rsLines);
-							aux = rsFCli;
-							System.out.println("rsFCli");
-							
+							aux = rsFCli;					
 						}
 						else{
 							rs.absolute(row);
 							aux = rs;	
 							obserField.setText(aux.getString("observacio"));
 							creditoField.setText(aux.getString("credito"));
-							System.out.println("rs" +row);
-							System.out.println("rs" +aux.getString("tipo_iva"));
-							//cliente.setTipoIVA(aux.getString("tipo_iva"));
+
 							
 						}
 						
@@ -132,7 +137,10 @@ public class Clientes extends JFrame {
 						
 						poblacionField.setText(aux.getString("poblacion"));
 						
-						provinciaField.setText(aux.getString("provincia"));				
+						provinciaField.setText(aux.getString("provincia"));		
+						
+						dto1TextField.setText(aux.getString("descu1"));
+						dto2TextField.setText(aux.getString("descu2"));
 						
 						
 						cliente = new Cliente(codigoField.getText(),st);
@@ -143,7 +151,9 @@ public class Clientes extends JFrame {
 						cliente.setObser(obserField.getText());
 						cliente.setCredit(creditoField.getText());
 						cliente.setCif(cifField.getText());
-						System.out.println("bueno6");
+						cliente.setDto1(dto1TextField.getText());
+						cliente.setDto2(dto2TextField.getText());
+		
 
 						if(row < rsLines){
 							// Insertamos contactos en contactoComboBox
@@ -153,7 +163,7 @@ public class Clientes extends JFrame {
 							while(auxrs.next()){
 								
 								String auxname = auxrs.getString("persona")+auxrs.getString("telefono")+auxrs.getString("email");						
-								System.out.println(auxname);
+						
 								contactoComboBox.addItem(auxname);
 								}
 							sql = "SELECT nombre FROM fpag WHERE codigo = '"+rs.getString(24)+"'";
@@ -172,6 +182,8 @@ public class Clientes extends JFrame {
 					}
 					
 				}	
+			
+				setCursor(Tasc.defCursor);
 			}
 		});
 		
@@ -179,16 +191,12 @@ public class Clientes extends JFrame {
 		contactoComboBox = new JComboBox();
 		contactoComboBox.setBounds(12, 232, 728, 24);
 		panelCliente.add(contactoComboBox);
-		
-
-		
+	
 		String sql = "SELECT * FROM clientes WHERE vendedor = '"+vendedorID+"' ORDER BY nombre";
 		String sqlFCli = "SELECT * FROM prclient WHERE vendedor = '"+vendedorID+"' ORDER BY nombre";
 		rs = bd.Consultar(sql);
 		rsFCli = bd.Consultar(sqlFCli);
-		
-		System.out.println("Hola"+sqlFCli);
-		
+	
 		try{
 			rsLines = 0;
 			while(rs.next()){
@@ -204,11 +212,11 @@ public class Clientes extends JFrame {
 			//rsLines += 1;// + 1 Porque le sumo la linea en el comboBox de aqui arriba.
 			int a = 0;
 			while(rsFCli.next()){
-				//System.out.println(++a);
+
 				Integer row = rsFCli.getRow();
 				String name = rsFCli.getString("nombre");		
 				hTable.put(name, row+rsLines);
-				System.out.println("LINEAS"+(row+rsLines));
+
 				clienteComboBox.addItem(name);
 			}
 			
@@ -255,6 +263,18 @@ public class Clientes extends JFrame {
 		panelCliente.add(cifField);
 		cifField.setColumns(10);
 		
+		dto1TextField = createTextField();
+		dto1TextField.setEditable(false);
+		dto1TextField.setBounds(450, 100, 50, 24);
+		panelCliente.add(dto1TextField);
+
+		
+		dto2TextField = createTextField();
+		dto2TextField.setEditable(false);
+		dto2TextField.setBounds(520, 100, 50, 24);
+		panelCliente.add(dto2TextField);
+
+		
 		cpField = new JTextField();
 		cpField.setEditable(false);
 		cpField.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -276,7 +296,7 @@ public class Clientes extends JFrame {
 		
 		obserField = new JTextArea();
 		obserField.setEditable(false);
-		obserField.setBackground(Color.yellow);
+		obserField.setBackground(Color.white);
 		obserField.setBounds(357, 320, 383, 100);
 		panelCliente.add(obserField);
 		obserField.setColumns(10);
@@ -298,6 +318,19 @@ public class Clientes extends JFrame {
 		cifLabel.setVerticalAlignment(SwingConstants.BOTTOM);
 		cifLabel.setBounds(590, 75, 150, 24);
 		panelCliente.add(cifLabel);
+		
+		dto1Label = new JLabel("DTO1");
+		dto1Label.setHorizontalAlignment(SwingConstants.LEFT);
+		dto1Label.setVerticalAlignment(SwingConstants.BOTTOM);
+		dto1Label.setBounds(460, 75, 50, 24);
+		panelCliente.add(dto1Label);
+		
+		dto2Label = new JLabel("DTO2");
+		dto2Label.setHorizontalAlignment(SwingConstants.LEFT);
+		dto2Label.setVerticalAlignment(SwingConstants.BOTTOM);
+		dto2Label.setBounds(520, 75, 50, 24);
+		panelCliente.add(dto2Label);
+		
 		
 		JLabel cpLabel = new JLabel("CP");
 		cpLabel.setHorizontalAlignment(SwingConstants.LEFT);
@@ -328,8 +361,9 @@ public class Clientes extends JFrame {
 		futuroCliButton = new JButton("FUTURO CLIENTE");
 		futuroCliButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				setCursor(Tasc.waitCursor);
 				FuturoCliente ps = new FuturoCliente(vendedorID,bd);
-				
+				setCursor(Tasc.defCursor);
 			}
 		}); 
 		futuroCliButton.setBounds(357, 270, 230, 30);
@@ -339,10 +373,9 @@ public class Clientes extends JFrame {
 		lsButton = new JButton("LISTADO PRESUPUESTOS");
 		lsButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				
-			
-				
+				setCursor(Tasc.waitCursor);
 				Presupuestos2 ps = new Presupuestos2(codigoField.getText(),vendedorID,cliente,bd);
+				setCursor(Tasc.defCursor);
 				
 			}
 		});
@@ -354,7 +387,9 @@ public class Clientes extends JFrame {
 		nuevoButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
+					setCursor(Tasc.waitCursor);
 					NuevoPresupuesto nps = new NuevoPresupuesto(null, vendedorID,cliente,bd);
+					setCursor(Tasc.defCursor);
 				} catch (SQLException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -369,8 +404,9 @@ public class Clientes extends JFrame {
 		pedidosButton = new JButton("PEDIDOS");
 		pedidosButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				setCursor(Tasc.waitCursor);
 				Pedidos p = new Pedidos(codigoField.getText(),bd);
-				
+				setCursor(Tasc.defCursor);
 			}
 		});
 		pedidosButton.setBounds(35, 350, 230, 30);
@@ -380,7 +416,9 @@ public class Clientes extends JFrame {
 		albButton = new JButton("ALB / FACT");
 		albButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				setCursor(Tasc.waitCursor);
 				Albaranes a = new Albaranes(codigoField.getText(),bd);
+				setCursor(Tasc.defCursor);
 				
 			}
 		});
@@ -396,4 +434,24 @@ public class Clientes extends JFrame {
 		//rs.se
 		return null;
 	}
+	
+	private JTextField createTextField() {
+        JTextField field = new JTextField();
+        ((AbstractDocument) field.getDocument()).setDocumentFilter(new DocumentFilter() {
+            @Override
+            public void insertString(FilterBypass fb, int off, String str, AttributeSet attr)
+                    throws BadLocationException {
+
+                //fb.insertString(off, str.replaceAll("\\D++", ""), attr);  // remove non-digits
+            	fb.insertString(off, str.replaceAll("[^0-9.]", ""), attr);
+            }
+
+            @Override
+            public void replace(FilterBypass fb, int off, int len, String str, AttributeSet attr)
+                    throws BadLocationException {               
+            	fb.replace(off, len, str.replaceAll("[^0-9.]", ""), attr);
+            }
+        });
+        return field;
+    }
 }

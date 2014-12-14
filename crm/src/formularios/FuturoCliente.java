@@ -33,6 +33,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import clases.BaseDatos;
 import clases.Cliente;
+import clases.Tasc;
 
 public class FuturoCliente extends JFrame {
 
@@ -68,6 +69,7 @@ public class FuturoCliente extends JFrame {
 	private JButton guardarButton;
 	private JButton visitaButton;
 	private NuevoPresupuesto nps;
+
 
 	
 
@@ -114,7 +116,7 @@ public class FuturoCliente extends JFrame {
 		codigoTextField.setAlignmentX(Component.RIGHT_ALIGNMENT);
 		contentPane.add(codigoTextField);
 	
-		nombreLabel= new JLabel("NOMBRE: ");
+		nombreLabel= new JLabel("NOMBRE*: ");
 		nombreLabel.setBounds(10, 40, 100, 24);
 		nombreLabel.setFont(new Font("Arial", Font.BOLD, 14));
 		contentPane.add(nombreLabel);		
@@ -134,7 +136,7 @@ public class FuturoCliente extends JFrame {
 		contentPane.add(cifTextField);	
 
 		
-		direccLabel = new JLabel("DIRECCION: ");
+		direccLabel = new JLabel("DIRECCION*: ");
 		direccLabel.setBounds(10, 100, 100, 24);
 		direccLabel.setFont(new Font("Arial", Font.BOLD, 14));
 		contentPane.add(direccLabel);
@@ -152,7 +154,7 @@ public class FuturoCliente extends JFrame {
 		cpTextField.setFont(new Font("Arial", Font.BOLD, 14));
 		contentPane.add(cpTextField);
 		
-		poblacionLabel = new JLabel("POBLACIÓN: ");
+		poblacionLabel = new JLabel("POBLACIÓN*: ");
 		poblacionLabel.setBounds(10, 160, 100, 24);
 		poblacionLabel.setFont(new Font("Arial", Font.BOLD, 14));
 		contentPane.add(poblacionLabel);
@@ -161,7 +163,7 @@ public class FuturoCliente extends JFrame {
 		poblacionTextField.setFont(new Font("Arial", Font.BOLD, 14));
 		contentPane.add(poblacionTextField);
 		
-		provinciaLabel = new JLabel("PROVINCIA: ");
+		provinciaLabel = new JLabel("PROVINCIA*: ");
 		provinciaLabel.setBounds(10, 190, 100, 24);
 		provinciaLabel.setFont(new Font("Arial", Font.BOLD, 14));
 		contentPane.add(provinciaLabel);
@@ -170,7 +172,7 @@ public class FuturoCliente extends JFrame {
 		provinciaTextField.setFont(new Font("Arial", Font.BOLD, 14));
 		contentPane.add(provinciaTextField);
 		
-		contactoLabel = new JLabel("CONTACTO: ");
+		contactoLabel = new JLabel("CONTACTO*: ");
 		contactoLabel.setBounds(10, 220, 100, 24);
 		contactoLabel.setFont(new Font("Arial", Font.BOLD, 14));
 		contentPane.add(contactoLabel);
@@ -179,7 +181,7 @@ public class FuturoCliente extends JFrame {
 		contactoTextField.setFont(new Font("Arial", Font.BOLD, 14));
 		contentPane.add(contactoTextField);
 		
-		telefonoLabel = new JLabel("TELEFONO: ");
+		telefonoLabel = new JLabel("TELEFONO*: ");
 		telefonoLabel.setBounds(10, 250, 100, 24);
 		telefonoLabel.setFont(new Font("Arial", Font.BOLD, 14));
 		contentPane.add(telefonoLabel);
@@ -220,7 +222,9 @@ public class FuturoCliente extends JFrame {
 		guardarButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				
-						
+				setCursor(Tasc.waitCursor);
+				
+				
 				cliente.setCodigo(codigoTextField.getText());
 				cliente.setNombre(nombreTextField.getText());
 				cliente.setVendedor(vendedor);
@@ -248,10 +252,7 @@ public class FuturoCliente extends JFrame {
 						+cliente.getDireccs()+"','"+cliente.getCp()+"','','"+cliente.getTlf()+"','TRUE','01','','"
 						+cliente.getContact()+"','','TRUE','"+cliente.getPoblacion()+"','"+cliente.getProvincia()+"','"
 						+cliente.getVendedor()+"')";
-				System.out.println(sql);
-				
-					
-		
+
 					if(cliente.minValues() && !existe){
 						bd.Ingresar(sql);
 						cliente.setSaved(true);
@@ -264,10 +265,12 @@ public class FuturoCliente extends JFrame {
 					}
 				}
 				catch(Exception s){
-					System.out.println("ERROR 0: "+s.getMessage());
+					System.out.println("ERROR INSERT: "+s.getMessage());
 				}
-				
+			    setCursor(Tasc.defCursor);
 			}
+			
+			
 		});
 		guardarButton.setBounds(30, 380, 200, 30);
 		contentPane.add(guardarButton);
@@ -277,6 +280,7 @@ public class FuturoCliente extends JFrame {
 		nuevoButton = new JButton("NUEVO PRESUPUESTO");
 		nuevoButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				
 				try {
 					if(!cliente.isSaved())
 						guardarButton.doClick();
@@ -284,10 +288,9 @@ public class FuturoCliente extends JFrame {
 						nps = new NuevoPresupuesto(null,vendedor,cliente,bd);
 					
 				} catch(Exception s){
-					System.out.println("ERROR 1: "+s.getMessage());
+					System.out.println("ERROR NEW: "+s.getMessage());
 				}
 
-				
 			}
 		});
 		nuevoButton.setBounds(300,380, 200, 30);

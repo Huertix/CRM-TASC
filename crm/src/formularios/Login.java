@@ -1,12 +1,14 @@
 package formularios;
 
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.JLabel;
@@ -23,12 +25,24 @@ import javax.swing.ImageIcon;
 
 
 
+
+
+
+
+
+
+
+
 import clases.BaseDatos;
+import clases.Tasc;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 
 import javax.swing.JComboBox;
 
@@ -42,6 +56,7 @@ public class Login extends JFrame {
 	private static Toolkit toolKit;
 	private static double locationWidth;
     private static double locationHeight;
+
 
 	/**
 	 * Launch the application.
@@ -69,14 +84,45 @@ public class Login extends JFrame {
         locationWidth =toolKit.getScreenSize().getWidth()/2;
         locationHeight =toolKit.getScreenSize().getHeight()/2;
         setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/imagenes/LogoTASC.png")));
-		
-		bd = new BaseDatos();
+	
 		setResizable(false);
 		setTitle("CRM TASC - LOGIN         Version BETA");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(0, 0, 516, 285);
 		setLocationRelativeTo(null);
 		setFocusable(true);
+		
+		addWindowListener( new WindowAdapter(){
+			public void windowClosing(WindowEvent e){
+		
+				System.exit(0);
+			}
+		});
+		
+		
+		DecimalFormat df = new DecimalFormat("#0.00");
+		
+		String d = df.format(0.0);
+		
+		if(d.equals("0,00")){
+			JOptionPane.showMessageDialog(this, "ESTE EQUIPO TIENE CONFIGURADO EL SEPARADOR DECIMAL "+
+		"CON COMA   ','.\nESTA CONFIGURACION NO ES COMPATIBLE CON LA BASE DE DATOS DE EUROWIN\n"+
+		"PUEDE UTILIZAR UNA DE LA SIGUIENTE SOLUCIONES:\n\n1 - CAMBIAR EL SEPARADO DECIMAL CON PUNTO '.' EN CONFIGURACION REGIONAL DEL PANEL DE CONTROL,\n"+
+		"    CONFIGURACIONALES ADICIONALES\n\n"+"2 - SELECCIONAR FORMATO INGLES (REINO UNIDO) EN LA PARTE SUPERIOR DE CONFIGURACIONES REGIONALES");
+			System.exit(0);
+		}
+			
+		
+		
+		int result = JOptionPane.showConfirmDialog(this,
+				"¿DESEA REALIZAR UNA CONEXION FUERA DE LA OFICINA?",
+				"TASC CRM - CONEXION BD",JOptionPane.YES_NO_OPTION);
+		if(result == JOptionPane.YES_OPTION)
+			bd = new BaseDatos(true);
+		else
+			bd = new BaseDatos(true);
+		
+		
 		contentPane = new JPanel();
 		contentPane.setBackground(new Color(30, 144, 255));
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -136,12 +182,12 @@ public class Login extends JFrame {
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				
-				
+				setCursor(Tasc.waitCursor);
 				boolean respuesta = false;
 				String usuario = comboBox.getSelectedItem().toString();
 				String password = new String(txtPassword.getPassword());
 				String sql = "SELECT * FROM vendedor WHERE nombre = '"+usuario+"' AND password = '"+password+"'";
-				//String sql = "SELECT * FROM vendedor";
+				
 				rs = bd.Consultar(sql);
 				try{
 					while(rs.next()){
@@ -149,13 +195,15 @@ public class Login extends JFrame {
 						usuarioID = rs.getString("codigo");
 					}
 					if(respuesta){
+						
+						
 						Hall hall = new Hall(usuario, usuarioID, bd);
 						setVisible(false);
 						
 					}
 					else{
 						JOptionPane.showMessageDialog(null, "Credenciales Incorrectas","Error",JOptionPane.ERROR_MESSAGE);
-						
+						setCursor(Tasc.defCursor);
 					}
 					
 
@@ -169,6 +217,7 @@ public class Login extends JFrame {
 				}
 			}
 		});
+		
 		btnNewButton.setBounds(56, 169, 274, 48);
 		contentPane.add(btnNewButton);
 		
@@ -182,8 +231,7 @@ public class Login extends JFrame {
 		lblNewLabel_2.setBackground(Color.WHITE);
 		lblNewLabel_2.setBounds(350, 50, 180, 180);
 		contentPane.add(lblNewLabel_2);
-		
-		
+	
 	
 	}
 }

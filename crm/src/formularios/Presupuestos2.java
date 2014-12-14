@@ -27,12 +27,14 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
@@ -69,12 +71,12 @@ import clases.BaseDatos;
 import clases.Cliente;
 import clases.Presupuesto;
 import clases.ToPDF;
+import clases.Tasc;
 
 public class Presupuestos2 extends JFrame {
 
 	private JPanel contentPane;
 	private final BaseDatos bd;
-	//private ResultSet  rs = null;
 	private JTable tabla ;	
 	private DefaultTableModel modelo;
 	private String fechaIni;
@@ -94,6 +96,10 @@ public class Presupuestos2 extends JFrame {
 	private Cliente cliente;
 	private String numerOferta;
 	private String vendedorID;
+	private JLabel dto1Label;
+	private JLabel dto2Label;
+	private JTextField dto1TextField;
+	private JTextField dto2TextField;
 
 
 
@@ -150,12 +156,12 @@ public class Presupuestos2 extends JFrame {
 					//JOptionPane.showMessageDialog(null, st,"ELECCION",JOptionPane.INFORMATION_MESSAGE);
 					st = String.format("%10s",st);
 					
-					System.out.println(st);
+				
 					String sql = "SELECT articulo,unidades,definicion,precio,dto1,importe,tipo_iva,importeiva FROM d_presuv  WHERE numero = '"+st+"'"; 
 					
 					String sqlFecha = "SELECT c_presuv.fecha FROM d_presuv,c_presuv WHERE d_presuv.numero = c_presuv.numero AND d_presuv.numero = '"+st+"'";
 					
-					//System.out.println(sql);
+				
 					try {
 						// Consulta la Fecha del Presuspuesto
 						ResultSet rs = bd.Consultar(sqlFecha);
@@ -175,16 +181,6 @@ public class Presupuestos2 extends JFrame {
 						}
 						
 						jFecha.setText(fecha);
-						
-						// Comprueba si el presupuesto corresponde a pedido
-						/*rs = bd.Consultar(sqlTrans);
-						int rows = 0;
-						if (rs.last()){
-							System.out.println("...................1");
-							aceptLabel.setText("ACEPTADO");
-						}
-						else
-							aceptLabel.setText("PENDIENTE");*/
 						
 			
 						parseData(bd.Consultar(sql));
@@ -297,7 +293,8 @@ public class Presupuestos2 extends JFrame {
 
 			public void actionPerformed(ActionEvent arg0) {
 				
-				
+				setCursor(Tasc.waitCursor);
+
 				numeroComboBox.removeAllItems();
 				array.removeAll(array);
 				
@@ -308,9 +305,7 @@ public class Presupuestos2 extends JFrame {
 				fechaIni = date_format.format(date);
 				date = fechaFinJP.getDate();
 				fechaFin = date_format.format(date);
-				System.out.println("INI: "+fechaIni);
-				System.out.println("INI: "+fechaFin);
-						
+		
 				int a = tabla.getRowCount();
 				if(a>1){
 					DefaultTableModel dm = (DefaultTableModel) tabla.getModel();
@@ -320,10 +315,7 @@ public class Presupuestos2 extends JFrame {
 					
 				String sql = "SELECT c_presuv.numero FROM c_presuv" 
 						 +" WHERE c_presuv.cliente = "+codigo+" AND c_presuv.fecha >= '"+fechaIni+"' AND c_presuv.fecha <= '"+fechaFin+"' ORDER BY c_presuv.fecha";
-				
-				System.out.println(sql);
-				
-				
+			
 				
 				try {
 					rs = bd.Consultar(sql);
@@ -346,6 +338,8 @@ public class Presupuestos2 extends JFrame {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} 
+	
+				setCursor(Tasc.defCursor);
 			}
 		});
 		updateButton.setBounds(780, 17, 180, 40);
@@ -391,6 +385,8 @@ public class Presupuestos2 extends JFrame {
 		modButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 			
+				setCursor(Tasc.waitCursor);
+
 				try {
 					ModificarPresupuesto mp = new ModificarPresupuesto(tabla, numerOferta, vendedorID, cliente,bd);
 					setVisible(false);
@@ -398,6 +394,8 @@ public class Presupuestos2 extends JFrame {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+				
+				setCursor(Tasc.defCursor);
 			}
 		});
 		modButton.setBounds(35, 650, 120, 30);
@@ -499,8 +497,17 @@ public class Presupuestos2 extends JFrame {
 		//int numeroColumnas = metaDatos.getColumnCount();
 		int numeroColumnas = 6;
 
+		
+		DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols(Locale.ENGLISH);
+		otherSymbols.setDecimalSeparator('.');
+		otherSymbols.setGroupingSeparator(','); 
+		DecimalFormat df = new DecimalFormat("#,###.##", otherSymbols);
+		
+		
+		
 		NumberFormat formatter = new DecimalFormat("#0.0000");  
-		DecimalFormat df = new DecimalFormat("#,###.##");
+		//DecimalFormat df = new DecimalFormat("#,###.##");
+		df.getNumberInstance(Locale.ENGLISH);
 		Double value = 0.00;
 		String resultImporte ="";
 		String resultImporteIva ="";
@@ -560,32 +567,6 @@ public class Presupuestos2 extends JFrame {
 
 			   }
 			   
-			  
-			   
-			   /* 
-			   Object a = rs.getObject(i+1);
-			   //System.out.println(a.getClass().getName());
-			   if(a.getClass().getName().equals("java.math.BigDecimal")){
-				   if(a.toString().equals("0.000000")){
-					   a="";
-				   }
-				   
-				   else{
-					   if(iva.trim().equals("")){
-						   System.out.println("SI");
-						   this.iva = rs.getString("tipo_iva");
-					   }
-					   BigDecimal b = (BigDecimal) a;
-					   value = b.doubleValue();
-					   a = value;
-				   }
-			   }
-		   
-			   
-			   fila[i] = a; // El primer indice en rs es el 1, no el cero, por eso se suma 1.
-			   */
-
-
 			   
 			   modelo.isCellEditable(rs.getRow(), i+1);
 		     

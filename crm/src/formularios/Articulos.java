@@ -45,6 +45,7 @@ import javax.xml.transform.TransformerException;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import clases.Tasc;
 
 public class Articulos extends JFrame implements ActionListener {
 
@@ -87,16 +88,16 @@ public class Articulos extends JFrame implements ActionListener {
 		bGroup.add(nombreRadioButton);
 		contentPane.add(nombreRadioButton);
 		
-		JLabel labelFamilia = new JLabel("FILTRAR POR FAMILIA");
-		labelFamilia.setBounds(260, 20, 200, 24);
-		contentPane.add(labelFamilia);
+		JLabel labelMarca = new JLabel("FILTRAR POR MARCA");
+		labelMarca.setBounds(260, 20, 200, 24);
+		contentPane.add(labelMarca);
 		
-		final JComboBox familiaComboBox = new JComboBox();
-		familiaComboBox.addItem("TODOS");
-		familiaComboBox.addActionListener(new ActionListener() {
+		final JComboBox marcaComboBox = new JComboBox();
+		marcaComboBox.addItem("TODOS");
+		marcaComboBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				if( familiaComboBox.getSelectedItem()!=null){
-					String st = familiaComboBox.getSelectedItem().toString();
+				if( marcaComboBox.getSelectedItem()!=null){
+					String st = marcaComboBox.getSelectedItem().toString();
 					if(st.equals("TODOS"))
 						familiaString = "";
 					else
@@ -110,7 +111,7 @@ public class Articulos extends JFrame implements ActionListener {
 		ResultSet familiasRS = bd.Consultar(sql);
 		try {
 			while(familiasRS.next()){
-				familiaComboBox.addItem(familiasRS.getString("nombre"));
+				marcaComboBox.addItem(familiasRS.getString("nombre"));
 			}
 		} catch (SQLException e1) {
 			// TODO Auto-generated catch block
@@ -118,15 +119,15 @@ public class Articulos extends JFrame implements ActionListener {
 		}
 		
 		
-		familiaComboBox.setBounds(250, 50, 200, 24);
-		contentPane.add(familiaComboBox);
+		marcaComboBox.setBounds(250, 50, 200, 24);
+		contentPane.add(marcaComboBox);
 		
 		
 		
 		JButton updateButton = new JButton("ACTUALIZAR");
 		updateButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				
+				setCursor(Tasc.waitCursor);
 				int a = tabla.getRowCount();
 				if(a>1){
 					DefaultTableModel dm = (DefaultTableModel) tabla.getModel();
@@ -137,7 +138,7 @@ public class Articulos extends JFrame implements ActionListener {
 				String sql = "SELECT articulo.codigo,articulo.nombre,pvp.pvp,marcas.nombre,articulo.nombre2 FROM articulo, pvp, marcas "
 						+"WHERE articulo.codigo = pvp.articulo AND articulo.marca = marcas.codigo "+familiaString+" ORDER BY "+order;
 				
-				System.out.println(sql);
+				
 				try {
 					parseData(bd.Consultar(sql));
 									
@@ -145,6 +146,7 @@ public class Articulos extends JFrame implements ActionListener {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} 
+				setCursor(Tasc.defCursor);
 			}
 		});
 		updateButton.setBounds(500, 20, 200, 50);
@@ -173,8 +175,7 @@ public class Articulos extends JFrame implements ActionListener {
 		       msg.setWrapStyleWord(true);
 
 		       JOptionPane.showMessageDialog(null, msg,"DESCRIPCIÓN",JOptionPane.INFORMATION_MESSAGE);
-		      // JOptionPane.showMessageDialog(null,"<html><body><p style='width: 400px;'>"+ tabla.getModel().getValueAt(row, 4)+"</body></html>","DESCRIPCIÓN",JOptionPane.INFORMATION_MESSAGE);
-		       System.out.println("row: "+row+" "+"Column: "+column);
+		  
 		     }
 		   }
 		 });
@@ -183,7 +184,7 @@ public class Articulos extends JFrame implements ActionListener {
 		modelo.addColumn("CÓDIGO");
 		modelo.addColumn("NOMBRE");
 		modelo.addColumn("PVP");
-		modelo.addColumn("FAMILIA");
+		modelo.addColumn("MARCA");
 		modelo.addColumn("DESCRIPCION");
 		JScrollPane scrollPane = new JScrollPane(tabla);
 		scrollPane.setBounds(20, 100, 970, 570);
@@ -191,10 +192,7 @@ public class Articulos extends JFrame implements ActionListener {
 	
 		
 		setResizable(false);
-		setVisible(true);
-		
-		
-		
+		setVisible(true);		
 	}
 	
 	
