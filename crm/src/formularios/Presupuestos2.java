@@ -100,6 +100,7 @@ public class Presupuestos2 extends JFrame {
 	private JLabel dto2Label;
 	private JTextField dto1TextField;
 	private JTextField dto2TextField;
+	private DefaultTableCellRenderer  rightRenderer;
 
 
 
@@ -153,7 +154,7 @@ public class Presupuestos2 extends JFrame {
 					
 					String st = numeroComboBox.getSelectedItem().toString();
 					numerOferta = st;
-					//JOptionPane.showMessageDialog(null, st,"ELECCION",JOptionPane.INFORMATION_MESSAGE);
+					
 					st = String.format("%10s",st);
 					
 				
@@ -277,15 +278,10 @@ public class Presupuestos2 extends JFrame {
         col.setMaxWidth(120);
         
         
-        DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
-        rightRenderer.setHorizontalAlignment(SwingConstants.RIGHT);
-        tabla.getColumnModel().getColumn(1).setCellRenderer(rightRenderer);
-        tabla.getColumnModel().getColumn(3).setCellRenderer(rightRenderer);
-        tabla.getColumnModel().getColumn(4).setCellRenderer(rightRenderer);
-        tabla.getColumnModel().getColumn(5).setCellRenderer(rightRenderer);	
-		
+        rightRenderer = new DefaultTableCellRenderer();
+        rightRenderer.setHorizontalAlignment( JLabel.RIGHT );
 
-		
+
 		array = new ArrayList<String>();
 		JButton updateButton = new JButton("ACTUALIZAR");
 		updateButton.addActionListener(new ActionListener() {
@@ -501,13 +497,10 @@ public class Presupuestos2 extends JFrame {
 		DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols(Locale.ENGLISH);
 		otherSymbols.setDecimalSeparator('.');
 		otherSymbols.setGroupingSeparator(','); 
-		DecimalFormat df = new DecimalFormat("#,###.##", otherSymbols);
-		
-		
-		
+		DecimalFormat df = new DecimalFormat("#,###.##", otherSymbols);		
 		NumberFormat formatter = new DecimalFormat("#0.0000");  
-		//DecimalFormat df = new DecimalFormat("#,###.##");
 		df.getNumberInstance(Locale.ENGLISH);
+		
 		Double value = 0.00;
 		String resultImporte ="";
 		String resultImporteIva ="";
@@ -531,7 +524,7 @@ public class Presupuestos2 extends JFrame {
 		   int columna = 0;
 		   for (int i=0;i<numeroColumnas;i++){
 		     
-			   String a = rs.getString(i+1);
+			   String a = rs.getString(i+1).trim();
 			   
 			   if(iva.trim().equals("")){
 				   this.iva = rs.getString("tipo_iva");
@@ -549,11 +542,15 @@ public class Presupuestos2 extends JFrame {
 				   fila[4]="";
 			   }
 			   
+			   
+			   
 			   if(i==1){
 				   String s = (String) fila[i];
 				   if(!s.equals("")){
 					   Double d = Double.parseDouble(s);
-					   fila[i] = String.format("%-15s", d);
+					   int e = d.intValue();
+					   fila[i] = String.format("%-15s", e);
+
 				   }
 				  
 			   }
@@ -562,13 +559,14 @@ public class Presupuestos2 extends JFrame {
 				   String s = (String) fila[i];
 				   if(!s.equals("")){
 					   Double d = Double.parseDouble(s);
-					   fila[i] = String.format("%-15.4f", d);
+					   fila[i] = String.format("%-15.2f", d);
 				   }
 
 			   }
 			   
 			   
 			   modelo.isCellEditable(rs.getRow(), i+1);
+			   
 		     
 		   }
 		   // Se añade al modelo la fila completa.
@@ -577,7 +575,11 @@ public class Presupuestos2 extends JFrame {
 		importeLabel.setText("BASE   "+resultImporte+" €");
 		importeIvaLabel.setText("TOTAL   "+resultImporteIva+" €");
 		ivaLabel.setText("IVA   "+this.iva+"%");
-		//tabla.setModel(modelo);
+		
+        tabla.getColumnModel().getColumn(1).setCellRenderer(rightRenderer);
+        tabla.getColumnModel().getColumn(3).setCellRenderer(rightRenderer);
+        tabla.getColumnModel().getColumn(4).setCellRenderer(rightRenderer);
+        tabla.getColumnModel().getColumn(5).setCellRenderer(rightRenderer);	
 		
 	}
 	

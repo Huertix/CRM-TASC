@@ -375,11 +375,13 @@ public class ModificarPresupuesto extends JFrame implements ActionListener {
 		ObserPanel.setMaximumSize(new Dimension(380,180));
 		obserTextArea =  new JTextArea(cliente.getObser());	
 		obserTextArea.setLineWrap(true);
-		obserTextArea.setBackground(Color.yellow);
+		obserTextArea.setBackground(Color.white);
 		obserTextArea.setMinimumSize(new Dimension(350,150));
 		obserTextArea.setPreferredSize(new Dimension(350,150));
 		obserTextArea.setMaximumSize(new Dimension(350,150));
 		ObserPanel.add(obserTextArea);
+		
+	
 		
 		tmr = (DefaultTableModel) tableImported.getModel();
 					
@@ -609,7 +611,7 @@ public class ModificarPresupuesto extends JFrame implements ActionListener {
 		ObserPanel2.setMaximumSize(new Dimension(300,140));
 		obser2TextArea =  new JTextArea();	
 		obser2TextArea.setLineWrap(true);
-		obser2TextArea.setBackground(Color.yellow);
+		obser2TextArea.setBackground(Color.white);
 		obser2TextArea.setMinimumSize(new Dimension(280,110));
 		obser2TextArea.setPreferredSize(new Dimension(280,110));
 		obser2TextArea.setMaximumSize(new Dimension(280,110));
@@ -1090,6 +1092,9 @@ public class ModificarPresupuesto extends JFrame implements ActionListener {
 		//rTable.print();
 		DecimalFormat df = new DecimalFormat("##0.00");
 		
+		Double dt1 = Double.parseDouble(dto1TextField.getText());
+		Double dt2 = Double.parseDouble(dto2TextField.getText());
+		
 		total = 0;
 		iva = 0;
 		base = 0;
@@ -1107,8 +1112,7 @@ public class ModificarPresupuesto extends JFrame implements ActionListener {
 			if(dto2TextField.getText().trim().equals(""))
 				dto2TextField.setText("0.00");
 			
-			Double dt1 = Double.parseDouble(dto1TextField.getText());
-			Double dt2 = Double.parseDouble(dto2TextField.getText());
+			
 			
 			Object check = rTable.getValueAt(i, 0);
 			String check1 = (String) rTable.getValueAt(i, 1);
@@ -1139,6 +1143,8 @@ public class ModificarPresupuesto extends JFrame implements ActionListener {
 								
 				importe = importe-(importe* 0.01 * descuento); 
 
+				
+				
 				rTable.setValueAt(df.format(importe), i, 5);
 				
 				base += importe;
@@ -1147,7 +1153,9 @@ public class ModificarPresupuesto extends JFrame implements ActionListener {
 		
 		}	
 		
-
+		base = base-(base* 0.01 * dt1);	
+		base = base-(base* 0.01 * dt2);
+			
 		tipoIVA = Integer.parseInt(tipoIvaTextField.getText());
 		iva = (base * tipoIVA)/100;
 		total = base + iva;

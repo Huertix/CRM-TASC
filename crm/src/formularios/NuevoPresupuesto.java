@@ -1151,20 +1151,15 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 		Double dt0;
 		Double dt1 = Double.parseDouble(dto1TextField.getText());
 		Double dt2 = Double.parseDouble(dto2TextField.getText());
-		
-		//base = base - (base* 0.01 * dt1);
-		//base = base - (base* 0.01 * dt2);
-		
-		
+
+		base = base-(base* 0.01 * dt1);	
+		base = base-(base* 0.01 * dt2);
 		
 		tipoIVA = Integer.parseInt(tipoIvaTextField.getText());
 		iva = (base * tipoIVA)/100;
 		total = base + iva;
 		
-		dt0 = dt1+(dt1*0.01*dt2);	
-		dtoPronto = ""+dt0;
-		
-		
+
 		baseTextField.setText(""+df.format((double)Math.round(base * 100)/100));
 		ivaTextField.setText(""+df.format((double)Math.round(iva * 100)/100));
 		totalTextField.setText(""+df.format((double)Math.round(total * 100)/100));
