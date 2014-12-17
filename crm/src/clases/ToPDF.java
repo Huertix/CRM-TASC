@@ -58,8 +58,10 @@ public class ToPDF{
 		
 		document = new Document(PageSize.A4 , 30, 30, 185, 75);
 		
+		chooser.setSelectedFile(new File("PR"+presu.getnOferta().trim()+".pdf"));
 		
 		int value = chooser.showSaveDialog(null);
+		
 		file = chooser.getSelectedFile();	
 		writer = PdfWriter.getInstance(document, new FileOutputStream(file));
 	
@@ -105,9 +107,7 @@ public class ToPDF{
           		createTitleTable();
           		
           		if(writer.getPageNumber()==totalPages.getPdfWriter().getPageNumber()){
-          			footer();
-          		System.out.println("PAGES: "+totalPages.getPdfWriter().getPageNumber() );
-          		
+          			footer();       		
           		}
 	
           		PdfContentByte canvas = writer.getDirectContent();
@@ -171,7 +171,6 @@ public class ToPDF{
 	}
 	
 	private void client() throws DocumentException{
-		System.out.println(presu.getCliente().getNombre());
 		String name = ""+ presu.getCliente().getNombre();
 		String addr = ""+presu.getCliente().getDireccs() ;
 		String CP = ""+presu.getCliente().getCp() ;

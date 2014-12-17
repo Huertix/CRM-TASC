@@ -734,15 +734,40 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 	
 	private String getNumPresu() throws SQLException{
 		
-		String q = "SELECT numero FROM c_presuv  WHERE modificado IS NULL OR modificado < '1' ORDER BY fecha";			
-		ResultSet aux = bd.Consultar(q);	
-		aux.last();	
+		//String q = "SELECT numero FROM c_presuv  WHERE modificado IS NULL OR modificado < '1' ORDER BY fecha";			
+		
+		String q = "SELECT numero FROM c_presuv";
+		ResultSet aux = bd.Consultar(q);
+		
+		int nextNum = 0;
+		while(aux.next()){
+			String s = aux.getString(1);
+			s = s.trim();
+			String string_out = ""; 
+			
+			for(int i=0;i<s.length();i++){
+				
+				if(!Character.isLetter(s.charAt(i)))
+					string_out = string_out + s.charAt(i);
+			}
+			
+			if(string_out.length()>5)
+				string_out = string_out.substring(0, 6);
+			int k = Integer.parseInt(string_out);
+			if( nextNum <= k ){
+				nextNum = k;
+			}
+		}
+		
+		return String.format("%10s",""+(nextNum+1));
+		
+		/*aux.last();	
 		JTextField jt = createTextField();
 		jt.setText(aux.getString(1));	
 		String numero = jt.getText();
 		int nextNumero = Integer.parseInt(numero)+1;		
 		numero = String.format("%10s",""+nextNumero);
-		return numero;
+		return numero;*/
 	}
 	
 

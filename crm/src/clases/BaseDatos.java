@@ -55,7 +55,7 @@ public class BaseDatos {
 		String host="tascsl.myftp.org";
 		
 		try{
-			
+			// Conexión Remota
 			if(remote){
 		
 				try{
@@ -72,7 +72,7 @@ public class BaseDatos {
 				//JOptionPane.showMessageDialog(null, "Connection: "+!conexion.isClosed(),"Info",JOptionPane.INFORMATION_MESSAGE);
 				
 			}
-
+			// Conexión local
 			else{
 				//Cargar el Driver
 				Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");

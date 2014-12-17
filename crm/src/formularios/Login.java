@@ -120,7 +120,7 @@ public class Login extends JFrame {
 		if(result == JOptionPane.YES_OPTION)
 			bd = new BaseDatos(true);
 		else
-			bd = new BaseDatos(true);
+			bd = new BaseDatos();
 		
 		
 		contentPane = new JPanel();

@@ -141,7 +141,7 @@ public class Presupuestos2 extends JFrame {
 		final JComboBox numeroComboBox = new JComboBox();
 		numeroComboBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				
+				setCursor(Tasc.waitCursor);
 				int a = tabla.getRowCount();
 				if(a>1){
 					DefaultTableModel dm = (DefaultTableModel) tabla.getModel();
@@ -195,6 +195,7 @@ public class Presupuestos2 extends JFrame {
 						e.printStackTrace();
 					}
 				}
+				setCursor(Tasc.defCursor);
 			}
 
 		});
