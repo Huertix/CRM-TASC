@@ -23,15 +23,9 @@ import java.awt.Color;
 
 import javax.swing.ImageIcon;
 
-
-
-
-
-
-
-
-
-
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import clases.BaseDatos;
 import clases.Tasc;
@@ -196,8 +190,28 @@ public class Login extends JFrame {
 					}
 					if(respuesta){
 						
+						Date date = new Date();
+						//Caso 1: obtener la hora y salida por pantalla con formato:
+						//DateFormat hourFormat = new SimpleDateFormat("HH:mm:ss");
+						//System.out.println("Hora: "+hourFormat.format(date));
+						//Caso 2: obtener la fecha y salida por pantalla con formato:
+						//DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+						//System.out.println("Fecha: "+dateFormat.format(date));
+						//Caso 3: obtenerhora y fecha y salida por pantalla con formato:
+						DateFormat hourdateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+						//System.out.println("Hora y fecha: "+hourdateFormat.format(date));
+						String fecha = hourdateFormat.format(date);
 						
 						Hall hall = new Hall(usuario, usuarioID, bd);
+						String sql_log_crm = "INSERT logcrm VALUES ('COMERCIAL#"+usuario+"','"+fecha+"')";
+						
+						try{
+							bd.Ingresar(sql_log_crm);
+						}
+						catch(Exception s){
+							System.out.println("ERROR LOGCRM: "+s.getMessage());
+						}
+						
 						setVisible(false);
 						
 					}
