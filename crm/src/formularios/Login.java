@@ -47,6 +47,7 @@ public class Login extends JFrame {
 	private BaseDatos bd = null;
 	private ResultSet  rs = null;
 	private String usuarioID;
+	private String fecha_ini;
 	private static Toolkit toolKit;
 	private static double locationWidth;
     private static double locationHeight;
@@ -80,7 +81,7 @@ public class Login extends JFrame {
         setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/imagenes/LogoTASC.png")));
 	
 		setResizable(false);
-		setTitle("CRM TASC - LOGIN         Version BETA");
+		setTitle("CRM TASC - LOGIN         Version BETA 8.1.15");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(0, 0, 516, 285);
 		setLocationRelativeTo(null);
@@ -88,7 +89,7 @@ public class Login extends JFrame {
 		
 		addWindowListener( new WindowAdapter(){
 			public void windowClosing(WindowEvent e){
-		
+
 				System.exit(0);
 			}
 		});
@@ -189,7 +190,7 @@ public class Login extends JFrame {
 						usuarioID = rs.getString("codigo");
 					}
 					if(respuesta){
-						
+						/*
 						Date date = new Date();
 						//Caso 1: obtener la hora y salida por pantalla con formato:
 						//DateFormat hourFormat = new SimpleDateFormat("HH:mm:ss");
@@ -200,17 +201,19 @@ public class Login extends JFrame {
 						//Caso 3: obtenerhora y fecha y salida por pantalla con formato:
 						DateFormat hourdateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 						//System.out.println("Hora y fecha: "+hourdateFormat.format(date));
-						String fecha = hourdateFormat.format(date);
+						fecha_ini = hourdateFormat.format(date);*/
 						
 						Hall hall = new Hall(usuario, usuarioID, bd);
-						String sql_log_crm = "INSERT logcrm VALUES ('COMERCIAL#"+usuario+"','"+fecha+"')";
+						
+						/*
+						String sql_log_crm = "INSERT logcrm VALUES ('COMERCIAL#"+usuarioID+"','"+fecha_ini+"','INICIO')";
 						
 						try{
 							bd.Ingresar(sql_log_crm);
 						}
 						catch(Exception s){
-							System.out.println("ERROR LOGCRM: "+s.getMessage());
-						}
+							System.out.println("ERROR INICIO LOGCRM: "+s.getMessage());
+						}*/
 						
 						setVisible(false);
 						

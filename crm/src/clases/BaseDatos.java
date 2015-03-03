@@ -76,7 +76,7 @@ public class BaseDatos {
 			else{
 				//Cargar el Driver
 				Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-				conexion = DriverManager.getConnection("jdbc:sqlserver://192.168.1.6\\SQLEXPRES12:49256;databaseNAME=2014LY","comercial","comercial");
+				conexion = DriverManager.getConnection("jdbc:sqlserver://192.168.1.6\\SQLEXPRES12:49256;databaseNAME=2015LY","comercial","comercial");
 				//JOptionPane.showMessageDialog(null, "Connection: "+!conexion.isClosed(),"Info",JOptionPane.INFORMATION_MESSAGE);
 			}
 		}

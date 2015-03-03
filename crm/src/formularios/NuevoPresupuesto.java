@@ -843,23 +843,38 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 					//int len = lines.length;
 
 					int nextRow = 1;
-					
+					boolean isNext=false;
 					String[] words = line.split(" ");
 					line = "";
 					int len = words.length;
 					for(int i=0;i<len;i++){
 						if(line.length()+words[i].length()<=75){
-							line = line.concat(" "+words[i]);						
+							line = line.concat(" "+words[i]);	
+							isNext = true;
 						}
-						else{							
-							
-							file[2] = line = line.trim();
+						
+						
+						else{
+							file[2] = line.trim();
 							tmr.insertRow(selectedRowR+nextRow,file);
 							line = words[i];
-							nextRow++;					
-						}					
+							nextRow++;	
+							isNext=false;
+							
+						}
+						
+						
+						
+					}
+					
+					if(isNext){
+						file[2] = line.trim();
+						tmr.insertRow(selectedRowR+nextRow,file);
+						nextRow++;	
 					}
 
+					
+					
 					file = new String[6];
 					tmr.insertRow(selectedRowR+nextRow,file);
 					

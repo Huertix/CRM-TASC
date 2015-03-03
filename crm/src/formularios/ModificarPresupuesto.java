@@ -779,42 +779,48 @@ public class ModificarPresupuesto extends JFrame implements ActionListener {
 										
 					String line = rs.getString(4);
 					
-					file = new String[6];
-					String[] lines = line.split("\\n");
-					line = "";
-					int len = lines.length;
-					int nextRow = 1;
-					
-					
-					
-					for(int i=0;i<len;i++){
-						String[] words = lines[i].split(" ");
-						
-						int len2 = words.length;
-						for(int j=0;j<len2;j++){
-							if(line.length()+words[j].length()<=75){
-								line = line+" "+words[j];
-								
-							}
-							else{
-								
-								file[2] = line.trim();
 
-								tmr.insertRow(selectedRowR+nextRow,file);
-								line = words[j];
-								nextRow++;
-								
-							}
+					line = line.replace("\n", "");			
+					file = new String[6];
+					//String[] lines = line.split("\\n");
+					//line = "";
+					//int len = lines.length;
+
+					int nextRow = 1;
+					boolean isNext=false;
+					String[] words = line.split(" ");
+					line = "";
+					int len = words.length;
+					for(int i=0;i<len;i++){
+						if(line.length()+words[i].length()<=75){
+							line = line.concat(" "+words[i]);	
+							isNext = true;
+						}
+						
+						
+						else{
+							file[2] = line.trim();
+							tmr.insertRow(selectedRowR+nextRow,file);
+							line = words[i];
+							nextRow++;	
+							isNext=false;
 							
 						}
 						
 						
 						
 					}
+					
+					if(isNext){
+						file[2] = line.trim();
+						tmr.insertRow(selectedRowR+nextRow,file);
+						nextRow++;	
+					}
+
+					
+					
 					file = new String[6];
 					tmr.insertRow(selectedRowR+nextRow,file);
-					
-
 
 					ListSelectionModel selectionModel = rTable.getSelectionModel();
 					int v = rTable.getRowCount();
@@ -1027,7 +1033,7 @@ public class ModificarPresupuesto extends JFrame implements ActionListener {
 										+cli+"','"+precioivaRow+"','"+importeivaRow+"','0','"+familia+"','0','"+precio+"','"
 										+importe+"','0','0.0000','1','0.0000','0','','','','"+importeiva+"','"+precioiva+"','0','','','','','','','','0.00',"
 										+ "'','0','','','0.000000','0.000000')";
-																
+								System.out.println(sqlD_Presuv);								
 
 								try{
 									bd.Ingresar(sqlD_Presuv);

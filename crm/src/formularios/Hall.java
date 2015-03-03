@@ -20,6 +20,14 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
 public class Hall extends JFrame {
 
 	private JPanel contentPane;
@@ -38,6 +46,30 @@ public class Hall extends JFrame {
 		setBounds(0 ,0 , 520, 400);
 		setLocationRelativeTo(null);
 		setFocusable(true);
+		
+		addWindowListener( new WindowAdapter(){
+			public void windowClosing(WindowEvent e){
+				/*Date date = new Date();
+				DateFormat hourdateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+				String fecha_fin = hourdateFormat.format(date);
+				
+				
+				String sql_log_crm = "INSERT logcrm VALUES ('COMERCIAL#"+usuarioID+"','"+fecha_fin+"','FIN')";
+				
+				try{
+					bd.Ingresar(sql_log_crm);
+				}
+				catch(Exception s){
+					System.out.println("ERROR FIN LOGCRM: "+s.getMessage());
+				}
+				*/
+				
+		
+				System.exit(0);
+			}
+		});
+		
+		
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
