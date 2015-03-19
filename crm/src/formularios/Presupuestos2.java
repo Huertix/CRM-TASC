@@ -405,7 +405,7 @@ public class Presupuestos2 extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 			
 				try {
-					NuevoPresupuesto mp = new NuevoPresupuesto(tabla,vendedorID, cliente,bd);
+					NuevoPresupuesto np = new NuevoPresupuesto(tabla,vendedorID, cliente,bd);
 					setVisible(false);
 				} catch (SQLException e) {
 					// TODO Auto-generated catch block

@@ -681,7 +681,7 @@ public class ModificarPresupuesto extends JFrame implements ActionListener {
 	
 	
 	
-	public void loadLTable(String sql){
+/*	public void loadLTable(String sql){
 		int a = lTable.getRowCount();
 		
 		if(a>1){
@@ -690,6 +690,40 @@ public class ModificarPresupuesto extends JFrame implements ActionListener {
 		}
 		    
 		
+		    try {
+				rs = bd.Consultar(sql);
+				
+				
+				int columns = tml.getColumnCount();
+				while(rs.next()){
+					
+					Object [] fila = new Object[columns];
+					for (int i=0;i<columns;i++){
+					      fila[i] = rs.getObject(i+1); // El primer indice en rs es el 1, no el cero, por eso se suma 1.
+					      lTable.getModel().isCellEditable(rs.getRow(), i+1);
+					}
+					
+					tml.addRow(fila);
+				
+				
+				}
+				lTable.setModel(tml);
+								
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} 
+	}*/
+	
+	
+	public void loadLTable(String sql){
+		int a = lTable.getRowCount();
+		
+		if(a>1){
+			tml.getDataVector().removeAllElements();
+		    lTable.revalidate();
+		}
+		    
 		    try {
 				rs = bd.Consultar(sql);
 				
@@ -1016,6 +1050,7 @@ public class ModificarPresupuesto extends JFrame implements ActionListener {
 								importe = getString(""+rTable.getValueAt(i, 5),1);
 								linea = ""+(i+1);
 								
+
 								double a = Double.parseDouble(precio);
 								a = a + (a*21)/100;
 								double b = Double.parseDouble(importe);
@@ -1027,13 +1062,12 @@ public class ModificarPresupuesto extends JFrame implements ActionListener {
 									def = def.substring(0, 74);
 								
 								
-						
+								
 								String sqlD_Presuv = "INSERT d_presuv VALUES ('COMERCIAL#"+usuario+"','"+Tasc.EMPRESA+"','"+nOfertaTextField.getText()+"',NULL,'"+articulo+"','"+def+"','"
 										+unidades+"','"+precio+"','"+dto+"','0','"+importe+"','"+tipo_iva+"','0.000000','0.000000','"+coste+"','','"+linea+"','"
 										+cli+"','"+precioivaRow+"','"+importeivaRow+"','0','"+familia+"','0','"+precio+"','"
 										+importe+"','0','0.0000','1','0.0000','0','','','','"+importeiva+"','"+precioiva+"','0','','','','','','','','0.00',"
-										+ "'','0','','','0.000000','0.000000')";
-								System.out.println(sqlD_Presuv);								
+										+ "'','0','','','0.000000','0.000000','','','0.0000')";
 
 								try{
 									bd.Ingresar(sqlD_Presuv);
@@ -1046,7 +1080,7 @@ public class ModificarPresupuesto extends JFrame implements ActionListener {
 							String sqlC_Presuv = "INSERT c_presuv VALUES ('COMERCIAL#"+usuario+"','"+Tasc.EMPRESA+"','"+nOfertaTextField.getText()+"','"
 									+fecha+"','"+cli+"','1',NULL,'','"+usuario+"','','0.00','0','0','"+observaciones+"','0','"
 									+base+"','0','000','1.000000','"+base+"','','','0','0',NULL,'"+fecha+"','0.0000','0.0000','0',"
-											+ "'','','0','','','','','0','0','','1')";
+											+ "'','','0','','','','','0','0','','0','','')";
 	
 
 							try{
@@ -1091,7 +1125,7 @@ public class ModificarPresupuesto extends JFrame implements ActionListener {
 			return s; 
 	}
 	
-	private static void updateRTable(){
+	/*private static void updateRTable(){
 
 		
 		
@@ -1170,7 +1204,83 @@ public class ModificarPresupuesto extends JFrame implements ActionListener {
 		baseTextField.setText(""+df.format(base));
 		ivaTextField.setText(""+df.format(iva));
 		totalTextField.setText(""+df.format(total));
+	}*/
+	
+	private static void updateRTable(){
+
+		//rTable.print();
+		
+		total = 0;
+		iva = 0;
+		base = 0;
+		
+		int rows = rTable.getRowCount();
+		DecimalFormat df = new DecimalFormat("##0.00");
+		for(int i=0;i<rows;i++){
+			
+			
+			Object check = rTable.getValueAt(i, 0);
+			String check1 = (String) rTable.getValueAt(i, 1);
+			String check2 = (String) rTable.getValueAt(i, 3);
+			String check3 = (String) rTable.getValueAt(i, 4) ;
+			
+			if(check!=null && check1!=null && check2!=null && check3!=null){
+				
+				if(!check1.isEmpty()){
+				
+					Double cantidad = Double.parseDouble(check1);
+					Double precio = Double.parseDouble(check2);
+					Double descuento = Double.parseDouble(check3);
+					Double importe = cantidad * precio;
+				
+					if(descuento > 0){
+						importe = importe-(importe*(descuento/100)); 
+					}
+				
+					rTable.setValueAt(df.format(importe), i, 5);
+				
+					base += importe;
+				}
+			}
+			else{
+				
+				rTable.setValueAt(new String(""),i, 0);
+				rTable.setValueAt(new String(""),i, 1);
+				rTable.setValueAt(new String(""),i, 3);
+				rTable.setValueAt(new String(""),i, 4);
+				rTable.setValueAt(new String(""),i, 5);
+				
+				
+			}
+			//tipoIVA = Integer.parseInt(tipoIvaTextField.getText());
+			
+			
+		}	
+		
+		if(dto1TextField.getText().trim().equals(""))
+			dto1TextField.setText("0.00");
+		if(dto2TextField.getText().trim().equals(""))
+			dto2TextField.setText("0.00");
+		
+		Double dt0;
+		Double dt1 = Double.parseDouble(dto1TextField.getText());
+		Double dt2 = Double.parseDouble(dto2TextField.getText());
+
+		base = base-(base* 0.01 * dt1);	
+		base = base-(base* 0.01 * dt2);
+		
+		tipoIVA = Integer.parseInt(tipoIvaTextField.getText());
+		iva = (base * tipoIVA)/100;
+		total = base + iva;
+		
+
+		baseTextField.setText(""+df.format((double)Math.round(base * 100)/100));
+		ivaTextField.setText(""+df.format((double)Math.round(iva * 100)/100));
+		totalTextField.setText(""+df.format((double)Math.round(total * 100)/100));
 	}
+
+	
+	
 	
 	
 	

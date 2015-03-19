@@ -1086,7 +1086,9 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 										+unidades+"','"+precio+"','"+dto+"','0','"+importe+"','"+tipo_iva+"','0.000000','0.000000','"+coste+"','','"+linea+"','"
 										+cli+"','"+precioivaRow+"','"+importeivaRow+"','0','"+familia+"','0','"+precio+"','"
 										+importe+"','0','0.0000','1','0.0000','0','','','','"+importeiva+"','"+precioiva+"','0','','','','','','','','0.00',"
-										+ "'','0','','','0.000000','0.000000')";
+										+ "'','0','','','0.000000','0.000000','','','0.0000')";
+								
+						
 																
 								
 								try{
@@ -1100,7 +1102,7 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
 							String sqlC_Presuv = "INSERT c_presuv VALUES ('COMERCIAL#"+usuario+"','"+Tasc.EMPRESA+"','"+nOfertaTextField.getText()+"','"
 									+fecha+"','"+cli+"','1',NULL,'','"+usuario+"','','0.00','0','0','"+observaciones+"','0','"
 									+base+"','0','000','1.000000','"+base+"','','','0','0',NULL,'"+fecha+"','0.0000','0.0000','0',"
-											+ "'','','0','','','','','0','0','','0')";
+											+ "'','','0','','','','','0','0','','0','','')";
 	
 							
 							
