@@ -225,7 +225,7 @@ public class ToPDF{
 		table = new PdfPTable(6);
 		table.setTotalWidth(width-document.leftMargin()-document.rightMargin());
 		table.setWidthPercentage(100);
-		table.setWidths(new int[]{2, 3, 2, 17, 3, 3});
+		table.setWidths(new int[]{2, 4, 2, 17, 3, 3});
 		table.setHorizontalAlignment(Element.ALIGN_CENTER);
 		
 		
@@ -270,7 +270,7 @@ public class ToPDF{
 		
 		table = new PdfPTable(6);
 		table.setWidthPercentage(100);
-		table.setWidths(new int[]{2, 3, 2, 17, 3, 3});
+		table.setWidths(new int[]{2, 4, 2, 17, 3, 3});
 		table.setHorizontalAlignment(Element.ALIGN_CENTER);
 
 	    
@@ -299,7 +299,7 @@ public class ToPDF{
 		    cell.setPhrase(item);   
 		    table.addCell(cell);
 	    		
-		    Phrase codigo = new Phrase(getString( ""+tableOri.getValueAt(i, 0) ), new Font(FontFamily.HELVETICA, 8));
+		    Phrase codigo = new Phrase(getString( ""+tableOri.getValueAt(i, 0) ), new Font(FontFamily.HELVETICA, 6));
 		    cell.setPhrase(codigo);
 		    table.addCell(cell);
 	    	
@@ -310,6 +310,7 @@ public class ToPDF{
 		    Phrase descripcion = new Phrase(getString(""+tableOri.getValueAt(i, 2)), new Font(FontFamily.HELVETICA, 8));
 		    cell.setPhrase(descripcion);
 		    cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+		    cell.setPaddingLeft(1);
 		    cell.setExtraParagraphSpace(4);
 		    table.addCell(cell);
 		    
