@@ -81,7 +81,7 @@ public class Login extends JFrame {
         setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/imagenes/LogoTASC.png")));
 	
 		setResizable(false);
-		setTitle("CRM TASC - LOGIN         Version BETA 20.3.15");
+		setTitle("CRM TASC - LOGIN         Version BETA 15.5.15");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(0, 0, 516, 285);
 		setLocationRelativeTo(null);

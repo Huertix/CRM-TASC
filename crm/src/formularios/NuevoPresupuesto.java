@@ -1217,13 +1217,13 @@ public class NuevoPresupuesto extends JFrame implements ActionListener {
                     throws BadLocationException {
 
                 //fb.insertString(off, str.replaceAll("\\D++", ""), attr);  // remove non-digits
-            	fb.insertString(off, str.replaceAll("[^0-9.]", ""), attr);
+            	fb.insertString(off, str.replaceAll("[^0-9.-]", ""), attr);
             }
 
             @Override
             public void replace(FilterBypass fb, int off, int len, String str, AttributeSet attr)
                     throws BadLocationException {               
-            	fb.replace(off, len, str.replaceAll("[^0-9.]", ""), attr);
+            	fb.replace(off, len, str.replaceAll("[^0-9.-]", ""), attr);
             }
         });
         return field;

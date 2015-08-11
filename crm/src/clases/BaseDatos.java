@@ -48,18 +48,18 @@ public class BaseDatos {
 		//int rport=49231;
 		int rport = 49256;
 		int port = 0;
-		String user="servidor";
-		String password="Tasc2011";
+		String user=".....";
+		String password="......";
 		String rhost="192.168.1.6\\SQLEXPRES12";
 		//String rhost="127.0.0.1\\SQLEXPRES12";
-		String host="tascsl.myftp.org";
+		String host=".......";
 		
 		try{
 			// Conexión Remota
 			if(remote){
 		
 				try{
-				    String comando = "ssh -L 49256:192.168.1.6:49256 servidor@tascsl.myftp.org";
+				    String comando = "ssh -L 49256:192.168.1.6:49256 .......myftp.org";
 				    final Process proceso = Runtime.getRuntime().exec(comando);
 				    
 				} catch(IOException e){
