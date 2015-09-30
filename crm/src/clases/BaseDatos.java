@@ -44,22 +44,17 @@ public class BaseDatos {
 	
 	private void Conectar(){
 		
-		int lport=49256;
-		//int rport=49231;
-		int rport = 49256;
-		int port = 0;
-		String user=".....";
-		String password="......";
-		String rhost="192.168.1.6\\SQLEXPRES12";
-		//String rhost="127.0.0.1\\SQLEXPRES12";
-		String host=".......";
+		final int port = 0;
+		final String user=".....";
+		final String lhost=".....";
+		final String rhost=".....";
 		
 		try{
 			// Conexión Remota
 			if(remote){
 		
 				try{
-				    String comando = "ssh -L 49256:192.168.1.6:49256 .......myftp.org";
+				    String comando = "ssh -L "+port+":"+lhost+":"+port+" "+user+"@"+rhost;
 				    final Process proceso = Runtime.getRuntime().exec(comando);
 				    
 				} catch(IOException e){
@@ -68,7 +63,7 @@ public class BaseDatos {
 	            
 				//Cargar el Driver
 				Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-				conexion = DriverManager.getConnection("jdbc:sqlserver://127.0.0.1\\SQLEXPRES12:49256;databaseNAME=2015LY","comercial","comercial");
+				conexion = DriverManager.getConnection("jdbc:sqlserver://127.0.0.1\\SQLEXPRES12:"+port+";databaseNAME=2015LY","comercial","comercial");
 				//JOptionPane.showMessageDialog(null, "Connection: "+!conexion.isClosed(),"Info",JOptionPane.INFORMATION_MESSAGE);
 				
 			}
@@ -76,7 +71,7 @@ public class BaseDatos {
 			else{
 				//Cargar el Driver
 				Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-				conexion = DriverManager.getConnection("jdbc:sqlserver://192.168.1.6\\SQLEXPRES12:49256;databaseNAME=2015LY","comercial","comercial");
+				conexion = DriverManager.getConnection("jdbc:sqlserver://"+lhost+"\\SQLEXPRES12:"+port+";databaseNAME=2015LY","comercial","comercial");
 				//JOptionPane.showMessageDialog(null, "Connection: "+!conexion.isClosed(),"Info",JOptionPane.INFORMATION_MESSAGE);
 			}
 		}
@@ -125,8 +120,8 @@ public class BaseDatos {
 			
 			sentencia = conexion.createStatement();
 			sentencia.executeUpdate(sql);
-
 			
+
 		}
 		catch(SQLException ex){
 			JOptionPane.showMessageDialog(null, "Fallo Conexión SQL (INGRESAR): \n"+ex.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);

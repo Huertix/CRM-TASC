@@ -25,6 +25,7 @@ import javax.swing.ImageIcon;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 import clases.BaseDatos;
@@ -51,6 +52,7 @@ public class Login extends JFrame {
 	private static Toolkit toolKit;
 	private static double locationWidth;
     private static double locationHeight;
+    private static ArrayList<String> allowedUsers;
 
 
 	/**
@@ -81,7 +83,7 @@ public class Login extends JFrame {
         setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/imagenes/LogoTASC.png")));
 	
 		setResizable(false);
-		setTitle("CRM TASC - LOGIN         Version BETA 15.5.15");
+		setTitle("CRM TASC - LOGIN         Version  30.09.15");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(0, 0, 516, 285);
 		setLocationRelativeTo(null);
@@ -94,6 +96,14 @@ public class Login extends JFrame {
 			}
 		});
 		
+		allowedUsers = new ArrayList<String>();
+		
+		allowedUsers.add("JORGE");
+		allowedUsers.add("Miguel Angel");
+		allowedUsers.add("Rafael Sevilla");
+		
+		
+			
 		
 		DecimalFormat df = new DecimalFormat("#0.00");
 		
@@ -139,9 +149,15 @@ public class Login extends JFrame {
 		comboBox.addItem(null);
 		String sql = "SELECT nombre FROM vendedor ORDER BY nombre";
 		rs = bd.Consultar(sql);
+		
 		try{
 			while(rs.next()){
-				comboBox.addItem(rs.getString(1));
+				
+				String name = rs.getString(1);
+				
+				if(allowedUsers.contains(name.trim()) ) {
+					comboBox.addItem(name);
+				}
 				
 			}	
 		}

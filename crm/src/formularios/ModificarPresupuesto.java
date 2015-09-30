@@ -1004,6 +1004,8 @@ public class ModificarPresupuesto extends JFrame implements ActionListener {
 		    catch(Exception e1){
 		    	
 		    }
+		    
+		    setCursor(Tasc.defCursor);
 			
 			if(!existe){
 		    
@@ -1012,6 +1014,8 @@ public class ModificarPresupuesto extends JFrame implements ActionListener {
 						   "¿Seguro desea Guardar el presupuesto en la Base de Datos?");// "+selectedRow+"?");
 	
 						if (JOptionPane.OK_OPTION == confirmado){
+							
+							setCursor(Tasc.waitCursor);
 							
 							Date date = fechaJP.getDate();
 							SimpleDateFormat date_format = new SimpleDateFormat("yyyyMMdd");
@@ -1085,17 +1089,22 @@ public class ModificarPresupuesto extends JFrame implements ActionListener {
 
 							try{
 								bd.Ingresar(sqlC_Presuv);
+								
 							}
 							catch(Exception s){
 								System.out.println("ERROR 2: "+s.getMessage());
 							}
+							
+							setCursor(Tasc.defCursor);
 						}
 			}
 			else
-				JOptionPane.showMessageDialog(null, "YA EXISTE ESTE NÚMERO DE PRESUPUESTO");		
+				JOptionPane.showMessageDialog(null, "YA EXISTE ESTE NÚMERO DE PRESUPUESTO");	
+			
+			
 		}
 		else{}  
-		setCursor(Tasc.defCursor);
+		
 	}
 	
 	private String checkDecimalString(String string){
